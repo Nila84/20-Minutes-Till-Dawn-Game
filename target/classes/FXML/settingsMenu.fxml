@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.menu.SettingsMenu"
+            stylesheets="@../CSS/commonStyles.css"
+            styleClass="Background"
+            prefHeight="700.0" prefWidth="700.0">
+    <center>
+        <VBox alignment="CENTER" spacing="30">
+            <Button text="Next Song" onMouseClicked="#nextSong" prefWidth="300"/>
+            <Button text="Toggle SFX" onMouseClicked="#toggleSFX" prefWidth="300"/>
+            <Button text="Auto-Reload" onMouseClicked="#autoReload" prefWidth="500"/>
+
+
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Move Up:"/>
+                <TextField fx:id="upKeyField" prefWidth="150"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Move Down:"/>
+                <TextField fx:id="downKeyField" prefWidth="150"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Move Left:"/>
+                <TextField fx:id="leftKeyField" prefWidth="150"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Move Right:"/>
+                <TextField fx:id="rightKeyField" prefWidth="150"/>
+            </HBox>
+
+            <Button text="Save Keys" onMouseClicked="#saveKeys" prefWidth="300"/>
+            <Button text="Change Theme" onMouseClicked="#changeTheme" prefWidth="300"/>
+            <Button text="Back" onMouseClicked="#back" prefWidth="200"/>
+        </VBox>
+    </center>
+</BorderPane>

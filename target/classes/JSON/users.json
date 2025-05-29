@@ -1,0 +1,138 @@
+[
+  {
+    "username": "NilaKesh",
+    "password": "@Nila6263",
+    "avatarFilePath": "file:/D:/22/target/classes/images/Avatars/8.png",
+    "killNum": 0,
+    "killNumber": 0,
+    "longestSurvivalTime": 0,
+    "score": 0,
+    "scores": 0,
+    "scoreOfDiff": [
+      0,
+      0,
+      0
+    ],
+    "lastGames": [
+      "2025-05-13 12:56:29",
+      "2025-05-13 12:56:29",
+      "2025-05-13 12:56:29"
+    ]
+  },
+  {
+    "username": "RoyaKesh",
+    "password": "@Roya1184",
+    "avatarFilePath": "file:/D:/22/target/classes/images/Avatars/6.png",
+    "favoriteColor": "Blue",
+    "selectedHero": {
+      "name": "SHANA",
+      "hp": 0,
+      "speed": 8
+    },
+    "selectedWeapon": {
+      "name": "Revolver",
+      "maxAmmo": 12,
+      "reloadTime": 1.0,
+      "projectileCount": 1,
+      "damagePerProjectile": 20,
+      "currentAmmo": 0,
+      "isReloading": false,
+      "reloadStartTime": 1748552627019,
+      "autoReload": false
+    },
+    "killNum": 31,
+    "killNumber": 42,
+    "acquiredAbilities": [
+      {
+        "name": "VITALITY",
+        "description": "افزایش ماکسیمم HP به اندازه یک واحد",
+        "duration": 0,
+        "type": "VITALITY",
+        "value": 1.0,
+        "isActive": true,
+        "activationTime": 1748121165403,
+        "originalDamage": 0,
+        "originalSpeed": 0.0
+      },
+      {
+        "name": "DAMAGER",
+        "description": "افزایش 25 درصدی میزان دمپج سلاح به مدت 10 ثانیه",
+        "duration": 10,
+        "type": "DAMAGER",
+        "value": 0.25,
+        "isActive": true,
+        "activationTime": 1748121320227,
+        "originalDamage": 25,
+        "originalSpeed": 0.0
+      },
+      {
+        "name": "SPEEDY",
+        "description": "دو برابر شدن سرعت حرکت بازیکن به مدت 10 ثانیه",
+        "duration": 10,
+        "type": "SPEEDY",
+        "value": 2.0,
+        "isActive": true,
+        "activationTime": 1748121323222,
+        "originalDamage": 0,
+        "originalSpeed": 16.0
+      },
+      {
+        "name": "AMOCREASE",
+        "description": "افزایش 5 واحدی حداکثر تعداد تیرهای سلاح",
+        "duration": 0,
+        "type": "AMOCREASE",
+        "value": 5.0,
+        "isActive": true,
+        "activationTime": 1748121324235,
+        "originalDamage": 0,
+        "originalSpeed": 0.0
+      },
+      {
+        "name": "PROCREASE",
+        "description": "افزایش یک واحدی Projectile سلاح",
+        "duration": 0,
+        "type": "PROCREASE",
+        "value": 1.0,
+        "isActive": true,
+        "activationTime": 1748121845161,
+        "originalDamage": 0,
+        "originalSpeed": 0.0
+      },
+      {
+        "name": "SPEEDY",
+        "description": "دو برابر شدن سرعت حرکت بازیکن به مدت 10 ثانیه",
+        "duration": 10,
+        "type": "SPEEDY",
+        "value": 2.0,
+        "isActive": true,
+        "activationTime": 1748121943278,
+        "originalDamage": 0,
+        "originalSpeed": 8.0
+      },
+      {
+        "name": "DAMAGER",
+        "description": "افزایش 25 درصدی میزان دمپج سلاح به مدت 10 ثانیه",
+        "duration": 10,
+        "type": "DAMAGER",
+        "value": 0.25,
+        "isActive": true,
+        "activationTime": 1748122504332,
+        "originalDamage": 20,
+        "originalSpeed": 0.0
+      }
+    ],
+    "longestSurvivalTime": 70009,
+    "score": 1206,
+    "scores": 1206,
+    "scoreOfDiff": [
+      0,
+      1906,
+      0
+    ],
+    "lastGames": [
+      "2025-05-13 15:00:00",
+      "2025-05-30 00:33:58",
+      "2025-05-13 15:00:00"
+    ]
+  }
+]

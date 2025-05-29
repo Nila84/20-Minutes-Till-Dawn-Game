@@ -1,0 +1,38 @@
+{
+  "username": "RoyaKesh",
+  "xp": 0,
+  "hp": 9,
+  "level": 1,
+  "kills": 0,
+  "remainingTime": 297276,
+  "enemyDataList": [
+    {
+      "x": 395.50957757304855,
+      "y": 125.01004970242577,
+      "type": "ElderMonster"
+    },
+    {
+      "x": 79.26929429895297,
+      "y": 250.09218306953127,
+      "type": "EyebatMonster"
+    },
+    {
+      "x": 629.2827425072152,
+      "y": 514.4007629210204,
+      "type": "ElderMonster"
+    },
+    {
+      "x": 214.16336460839133,
+      "y": 543.3068709548511,
+      "type": "EyebatMonster"
+    },
+    {
+      "x": 599.5559284016183,
+      "y": 156.35839295241956,
+      "type": "EyebatMonster"
+    }
+  ],
+  "heroName": "SHANA",
+  "weaponName": "Revolver",
+  "abilityName": "VITALITY"
+}
