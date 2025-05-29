@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.menu.TalentMenu"
+            stylesheets="@../CSS/commonStyles.css"
+            styleClass="Background"
+            prefWidth="900" prefHeight="800">
+
+    <top>
+        <Label text="TALENT MENU"
+               style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2b579a;">
+            <padding>
+                <Insets top="30" bottom="20"/>
+            </padding>
+            <BorderPane.alignment>CENTER</BorderPane.alignment>
+        </Label>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true">
+            <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 20;">
+                <VBox spacing="10" style="-fx-background-color: rgba(200,200,200,0.2); -fx-background-radius: 10; -fx-padding: 15;">
+                    <Label text="CHEAT CODES"
+                           style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #d35400; -fx-underline: true;"/>
+
+                    <VBox spacing="8" style="-fx-padding: 10;">
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="• Reduce Game Time:"
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label text="Shortens remaining game time by 50%"
+                                   style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+                        </HBox>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="• Level Up Character:"
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label text="Instantly levels up with full animations"
+                                   style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+                        </HBox>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="• Restore Health:"
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label text="Fully restores health when empty"
+                                   style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+                        </HBox>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="• Trigger Boss Fight:"
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label text="Skips to boss fight immediately"
+                                   style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+                        </HBox>
+
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label text="• Infinite Ammo:"
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label text="Custom cheat: Unlimited ammo for 60 sec"
+                                   style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="heroesBox" spacing="10" style="-fx-padding: 10;">
+                    <Label text="HEROES" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-underline: true;"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <Label text="ABILITIES" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-underline: true;"/>
+                    <GridPane fx:id="abilitiesGrid" hgap="20" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="LEFT" prefWidth="200"/>
+                            <ColumnConstraints halignment="LEFT" prefWidth="400"/>
+                        </columnConstraints>
+                    </GridPane>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: rgba(200,200,200,0.2); -fx-background-radius: 10; -fx-padding: 15;">
+                    <Label text="KEY BINDINGS"
+                           style="-fx-font-size: 24; -fx-font-weight: bold; -fx-underline: true;"/>
+
+                    <HBox spacing="30" alignment="CENTER" style="-fx-padding: 10;">
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Move Up" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label fx:id="upKeyLabel" style="-fx-font-size: 18; -fx-text-fill: #2980b9;"/>
+                        </VBox>
+
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Move Down" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label fx:id="downKeyLabel" style="-fx-font-size: 18; -fx-text-fill: #2980b9;"/>
+                        </VBox>
+
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Move Left" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label fx:id="leftKeyLabel" style="-fx-font-size: 18; -fx-text-fill: #2980b9;"/>
+                        </VBox>
+
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Move Right" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label fx:id="rightKeyLabel" style="-fx-font-size: 18; -fx-text-fill: #2980b9;"/>
+                        </VBox>
+
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Shoot" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Label fx:id="shootKeyLabel" style="-fx-font-size: 18; -fx-text-fill: #2980b9;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <Button text="BACK TO MAIN MENU" onMouseClicked="#back"
+                style="-fx-font-size: 18; -fx-font-weight: bold; -fx-pref-width: 300; -fx-pref-height: 50; -fx-background-color: #2c3e50; -fx-text-fill: white;">
+            <padding>
+                <Insets top="15" bottom="15" left="30" right="30"/>
+            </padding>
+            <BorderPane.alignment>CENTER</BorderPane.alignment>
+        </Button>
+    </bottom>
+</BorderPane>

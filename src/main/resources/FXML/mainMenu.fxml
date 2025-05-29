@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.menu.MainMenu"
+            stylesheets="@../CSS/commonStyles.css"
+            styleClass="Background"
+            prefHeight="700.0" prefWidth="700.0">
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" styleClass="user-info-box">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <ImageView fx:id="avatarImageView" fitWidth="60" fitHeight="60" />
+            <VBox>
+                <Label fx:id="usernameLabel" styleClass="username-label"/>
+                <Label fx:id="scoreLabel" styleClass="score-label"/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox alignment="CENTER" spacing="40" styleClass="mainMenuButtons">
+            <Button text="Talent menu" onMouseClicked="#talentMenu"/>
+            <Button text="Pre-Game menu" onMouseClicked="#preGameMenu"/>
+            <Button text="Resume game" onMouseClicked="#resumingPreviousGame"/>
+            <Button text="Profile menu" onMouseClicked="#profileMenu" />
+            <Button text="Scoreboard" onMouseClicked="#scoreBoardMenu"/>
+            <Button text="Settings" onMouseClicked="#settings"/>
+            <Button text="Logout" onMouseClicked="#logout"/>
+            <Button text="Exit" onMouseClicked="#exit"/>
+        </VBox>
+    </center>
+</BorderPane>
