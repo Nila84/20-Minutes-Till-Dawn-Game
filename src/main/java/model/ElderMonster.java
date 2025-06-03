@@ -4,9 +4,11 @@ import javafx.scene.paint.Color;
 
 public class ElderMonster extends Monster {
     private long lastDashTime;
-    private static final long DASH_COOLDOWN = 5000; // 5 ثانیه
+    private static final long DASH_COOLDOWN = 5000;
     private boolean shieldActive;
     private double shieldSize;
+    private long lastShotTime;
+    private final long shotCooldown = 5000;
 
     public ElderMonster(double x, double y, Color color) {
         super(400, 3, 0.1, true, x, y, color);
@@ -24,6 +26,14 @@ public class ElderMonster extends Monster {
         }
     }
 
+    public boolean canShoot(long now) {
+        return now - lastShotTime >= shotCooldown;
+    }
+
+    public void shot(long now) {
+        lastShotTime = now;
+    }
+
     @Override
     public void checkSpawn(){
 
@@ -32,6 +42,12 @@ public class ElderMonster extends Monster {
     @Override
     public void attack() {
     }
+
+    @Override
+    protected double getOriginalRadius() {
+        return 20;
+    }
+
 
     public void updateShield(double gameProgress) {
         this.shieldSize = 1.0 - gameProgress;

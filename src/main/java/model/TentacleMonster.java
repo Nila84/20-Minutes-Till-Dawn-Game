@@ -9,6 +9,10 @@ public class TentacleMonster extends Monster {
         super(25, 1, 0.5, false, x, y, color);
 
     }
+    @Override
+    protected double getOriginalRadius() {
+        return 15;
+    }
 
     @Override
     public void move() {

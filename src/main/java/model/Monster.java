@@ -1,7 +1,6 @@
 package model;//package model;
 
-import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -13,6 +12,8 @@ public abstract class Monster {
     private double knockbackDistance = 30;
     private double knockbackSpeed = 10;
     private double originalX, originalY;
+    protected transient Timeline pulseTimeline;
+    protected boolean isPulsing = false;
 
     public void setSpeed(double speed) {
         this.speed = speed;
@@ -43,17 +44,14 @@ public abstract class Monster {
     }
 
     public void move(double targetX, double targetY) {
-        // محاسبه جهت حرکت
         double dx = targetX - this.x;
         double dy = targetY - this.y;
         double distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > 0) {
-            // به‌روزرسانی موقعیت منطقی
             this.x += (dx / distance) * speed;
             this.y += (dy / distance) * speed;
 
-            // به‌روزرسانی موقعیت گرافیکی
             shape.setCenterX(this.x);
             shape.setCenterY(this.y);
         }
@@ -149,7 +147,6 @@ public abstract class Monster {
     }
 
     public void updatePosition() {
-        // همگام‌سازی موقعیت گرافیکی با موقعیت منطقی
         shape.setCenterX(this.x);
         shape.setCenterY(this.y);
     }
@@ -165,7 +162,49 @@ public abstract class Monster {
     public double getX() { return x; }
     public double getY() { return y; }
 
+    public void startPulseAnimation() {
+        if (pulseTimeline != null) {
+            pulseTimeline.stop();
+        }
+
+        double originalRadius = getShape().getRadius();
+        Color originalColor = (Color) getShape().getFill();
+
+        pulseTimeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(getShape().radiusProperty(), originalRadius),
+                        new KeyValue(getShape().fillProperty(), originalColor)
+                ),
+                new KeyFrame(Duration.seconds(0.2),
+                        new KeyValue(getShape().radiusProperty(), originalRadius * 0.9),
+                        new KeyValue(getShape().fillProperty(), originalColor.brighter())
+                ),
+                new KeyFrame(Duration.seconds(0.4),
+                        new KeyValue(getShape().radiusProperty(), originalRadius),
+                        new KeyValue(getShape().fillProperty(), originalColor)
+                )
+        );
+
+        pulseTimeline.setCycleCount(Animation.INDEFINITE);
+        pulseTimeline.setAutoReverse(true);
+        pulseTimeline.play();
+        isPulsing = true;
+    }
+
+    public void stopPulseAnimation() {
+        if (pulseTimeline != null) {
+            pulseTimeline.stop();
+            getShape().setRadius(getOriginalRadius());
+            isPulsing = false;
+        }
+    }
+
+    protected abstract double getOriginalRadius();
 
     public abstract void move();
     public abstract void attack();
+
+    public boolean isPulsing() {
+        return isPulsing;
+    }
 }

@@ -1,5 +1,5 @@
 package view.menu;
-//
+
 import controller.App;
 import controller.GameController;
 import controller.GameViewController;
@@ -55,8 +55,12 @@ public class GameScreen {
     private long lastSpeedIncreaseTime = 0;
     public static boolean isMute = false;
     private static boolean isImmune = false;
+    private static boolean isImmune2 = false;
     private static long immuneStartTime = 0;
-    //آسیب ناپذیری پلیر
+    private static final double PULSE_AMOUNT = 2.0;
+    private static final double PULSE_SPEED = 0.1;
+    private Timeline pulseTimeline;
+
     private static final long IMMUNE_DURATION = 2000;
     private static Hero hero;
     public static Ability ability;
@@ -80,6 +84,15 @@ public class GameScreen {
     public AnimationTimer gameLoop;
     private static boolean busFight = false;
     private static boolean canBussFight = true;
+    private static Rectangle barrier;
+    private static boolean barrierActive = false;
+    private static Timeline barrierTimeline;
+    private static final double INITIAL_BARRIER_SIZE = 100;
+    private static final double BARRIER_SHRINK_DURATION = 30;
+    private static final double MIN_BARRIER_SIZE = 200;
+    private static final int BARRIER_DAMAGE = 2;
+    private static long lastBarrierDamageTime = 0;
+    private static final long BARRIER_DAMAGE_COOLDOWN = 1000;
 
 
     public GameScreen() {
@@ -249,6 +262,7 @@ public class GameScreen {
         else if (hero.getName().equals("DASHER")) player = new Circle(PLAYER_RADIUS, Color.BLUE);
         player.setCenterX(WIDTH / 2.0);
         player.setCenterY(HEIGHT / 2.0);
+        setupPulseAnimation();
 
         timeText = new Text();
         timeText.setFont(new Font(20));
@@ -383,13 +397,6 @@ public class GameScreen {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // حرکت هیولاها
-                for (Monster monster : monsters) {
-//                    monster.move(player.getCenterX(), player.getCenterY());  // فرض بر این که move() مختصات هدف رو می‌گیرد
-                }
-
-                // آپدیت UI (مثل تایمر، HP، کیلس و ... اگر لازم است)
-//                updateGameUI();
             }
         };
         gameLoop.start();
@@ -402,6 +409,13 @@ public class GameScreen {
         stage.setTitle("Game");
         stage.show();
         gamePane.requestFocus();
+    }
+
+    private Color getPlayerColor() {
+        return hero.getName().equals("SHANA") ? Color.PURPLE :
+                hero.getName().equals("DIAMOND") ? Color.PINK :
+                        hero.getName().equals("LILITH") ? Color.GREEN :
+                                hero.getName().equals("SCARLET") ? Color.GRAY : Color.BLUE;
     }
 
     void updateGameUI(SavedGameData savedData) {
@@ -555,7 +569,9 @@ public class GameScreen {
             public void handle(long now) {
                 if (!GameController.isPaused) {
                     checkBussFight();
+                    restrictPlayerMovement();
                     checkPlayerObstacleCollision();
+                    checkBarrierCollision();
                     checkImmunity();
                     weapon.updateReload();
                     ability.update();
@@ -577,11 +593,24 @@ public class GameScreen {
         gameTimer.start();
     }
 
+//    public void checkBussFight() {
+//        long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+//        if (elapsedTime >= gameDuration / 2 && canBussFight) {
+//            spawnElderMonster();
+//            canBussFight = false;
+//        }
+//    }
     public void checkBussFight() {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         if (elapsedTime >= gameDuration / 2 && canBussFight) {
             spawnElderMonster();
+            createBarrier();
             canBussFight = false;
+        }
+
+        if (busFight && monsters.stream().noneMatch(m -> m instanceof ElderMonster)) {
+            busFight = false;
+            removeBarrier();
         }
     }
 
@@ -797,7 +826,7 @@ public class GameScreen {
     public void checkMonsterSpeedIncrease() {
         boolean done = false;
         long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        if (elapsedSeconds - lastSpeedIncreaseTime >= 5) {
+        if (elapsedSeconds - lastSpeedIncreaseTime >= 7) {
             for (Monster monster : monsters) {
                 if (monster instanceof ElderMonster) {
                     monster.setSpeed(monster.getSpeed() * 2);
@@ -838,6 +867,9 @@ public class GameScreen {
         for (Monster monster : monsters) {
             monster.checkSpawn();
             if (monster.isAlive()) {
+                if (!monster.isPulsing()) {
+                    monster.startPulseAnimation();
+                }
                 monster.moveTowards(player);
                 monster.getShape().setCenterX(monster.getX());
                 monster.getShape().setCenterY(monster.getY());
@@ -852,6 +884,18 @@ public class GameScreen {
                         bullets.add(bullet);
                         gamePane.getChildren().add(bullet.getShape());
                         System.out.println("Eyebat shooting!");
+                    }
+                }
+                if (monster instanceof ElderMonster elderMonster) {
+                    if (elderMonster.canShoot(now)) {
+                        elderMonster.shot(now);
+                        Bullet bullet = new Bullet(
+                                elderMonster.getX(), elderMonster.getY(),
+                                player.getCenterX(), player.getCenterY()
+                        );
+                        bullets.add(bullet);
+                        gamePane.getChildren().add(bullet.getShape());
+                        System.out.println("Elder shooting!");
                     }
                 }
 
@@ -1189,8 +1233,8 @@ public class GameScreen {
     private void addGlowToPlayer() {
         DropShadow glow = new DropShadow();
         glow.setColor(Color.YELLOW);
-        glow.setRadius(20); // اندازه هاله نور
-        glow.setSpread(0.5); // شدت نور (بین 0 تا 1)
+        glow.setRadius(20);
+        glow.setSpread(0.5);
 
         player.setEffect(glow);
     }
@@ -1354,6 +1398,181 @@ public class GameScreen {
         if (gameLoop != null) gameLoop.stop();
         startGameTimer();
         gameLoop.start();
+    }
+
+    private void createBarrier() {
+        double initialSize = Math.min(WIDTH, HEIGHT) / 4;
+        barrier = new Rectangle(
+                initialSize,
+                initialSize,
+                WIDTH - 2 * initialSize,
+                HEIGHT - 2 * initialSize
+        );
+        barrier.setFill(Color.TRANSPARENT);
+        barrier.setStroke(Color.RED);
+        barrier.setStrokeWidth(3);
+        barrier.setStrokeDashOffset(10);
+        barrier.getStrokeDashArray().addAll(20d, 10d);
+
+        Glow glow = new Glow(0.5);
+        barrier.setEffect(glow);
+
+        gamePane.getChildren().add(barrier);
+        barrierActive = true;
+
+        barrierTimeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(barrier.xProperty(), initialSize),
+                        new KeyValue(barrier.yProperty(), initialSize),
+                        new KeyValue(barrier.widthProperty(), WIDTH - 2 * initialSize),
+                        new KeyValue(barrier.heightProperty(), HEIGHT - 2 * initialSize)
+                ),
+                new KeyFrame(Duration.seconds(BARRIER_SHRINK_DURATION),
+                        new KeyValue(barrier.xProperty(), (WIDTH - MIN_BARRIER_SIZE)/2),
+                        new KeyValue(barrier.yProperty(), (HEIGHT - MIN_BARRIER_SIZE)/2),
+                        new KeyValue(barrier.widthProperty(), MIN_BARRIER_SIZE),
+                        new KeyValue(barrier.heightProperty(), MIN_BARRIER_SIZE)
+                )
+        );
+        barrierTimeline.setCycleCount(1);
+        barrierTimeline.play();
+    }
+
+    private void restrictPlayerMovement() {
+        if (!barrierActive) return;
+
+        double px = player.getCenterX();
+        double py = player.getCenterY();
+        double pr = player.getRadius();
+        boolean adjusted = false;
+
+        if (px - pr < barrier.getX()) {
+            player.setCenterX(barrier.getX() + pr);
+            adjusted = true;
+        }
+        else if (px + pr > barrier.getX() + barrier.getWidth()) {
+            player.setCenterX(barrier.getX() + barrier.getWidth() - pr);
+            adjusted = true;
+        }
+
+        if (py - pr < barrier.getY()) {
+            player.setCenterY(barrier.getY() + pr);
+            adjusted = true;
+        }
+        else if (py + pr > barrier.getY() + barrier.getHeight()) {
+            player.setCenterY(barrier.getY() + barrier.getHeight() - pr);
+            adjusted = true;
+        }
+
+        if (adjusted && !isImmune2) {
+            hero.setHp(-BARRIER_DAMAGE);
+            isImmune2 = true;
+            immuneStartTime = System.currentTimeMillis();
+            createHitEffect();
+            GameMenu.playDamage();
+        }
+    }
+
+    private void checkBarrierCollision() {
+        if (!barrierActive || isImmune) return;
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBarrierDamageTime < BARRIER_DAMAGE_COOLDOWN) return;
+
+        double px = player.getCenterX();
+        double py = player.getCenterY();
+        double pr = player.getRadius();
+
+        boolean collided = false;
+
+        if (px - pr < barrier.getX()) {
+            player.setCenterX(barrier.getX() + pr);
+            collided = true;
+        }
+        else if (px + pr > barrier.getX() + barrier.getWidth()) {
+            player.setCenterX(barrier.getX() + barrier.getWidth() - pr);
+            collided = true;
+        }
+
+        if (py - pr < barrier.getY()) {
+            player.setCenterY(barrier.getY() + pr);
+            collided = true;
+        }
+        else if (py + pr > barrier.getY() + barrier.getHeight()) {
+            player.setCenterY(barrier.getY() + barrier.getHeight() - pr);
+            collided = true;
+        }
+
+        if (collided) {
+            lastBarrierDamageTime = currentTime;
+            hero.setHp(-BARRIER_DAMAGE);
+            isImmune = true;
+            immuneStartTime = currentTime;
+
+            createHitEffect();
+            GameMenu.playDamage();
+
+            if (hero.getHp() <= 0) {
+                gameTimer.stop();
+                showGameOverScreen();
+            }
+        }
+    }
+
+    private void removeBarrier() {
+        if (!barrierActive) return;
+
+        FadeTransition fade = new FadeTransition(Duration.seconds(1), barrier);
+        fade.setFromValue(1);
+        fade.setToValue(0);
+        fade.setOnFinished(e -> {
+            gamePane.getChildren().remove(barrier);
+            barrierActive = false;
+        });
+        fade.play();
+
+        if (barrierTimeline != null) {
+            barrierTimeline.stop();
+        }
+    }
+
+    public void startPulseAnimation() {
+        if (pulseTimeline == null) {
+            setupPulseAnimation();
+        }
+        if (pulseTimeline.getStatus() != Animation.Status.RUNNING) {
+            pulseTimeline.playFromStart();
+        }
+    }
+
+    public void stopPulseAnimation() {
+        if (pulseTimeline != null) {
+            pulseTimeline.stop();
+            player.setRadius(PLAYER_RADIUS);
+            player.setFill(getPlayerColor());
+        }
+    }
+
+    private void setupPulseAnimation() {
+        double originalRadius = PLAYER_RADIUS;
+        Color originalColor = getPlayerColor();
+
+        pulseTimeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(player.radiusProperty(), originalRadius),
+                        new KeyValue(player.fillProperty(), originalColor)
+                ),
+                new KeyFrame(Duration.seconds(0.15),
+                        new KeyValue(player.radiusProperty(), originalRadius - 1.5),
+                        new KeyValue(player.fillProperty(), originalColor.brighter())
+                ),
+                new KeyFrame(Duration.seconds(0.3),
+                        new KeyValue(player.radiusProperty(), originalRadius),
+                        new KeyValue(player.fillProperty(), originalColor)
+                )
+        );
+        pulseTimeline.setCycleCount(Animation.INDEFINITE);
+        pulseTimeline.setAutoReverse(true);
     }
 
 }

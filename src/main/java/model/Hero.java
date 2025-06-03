@@ -15,23 +15,23 @@ public class Hero {
         this.name = selectedHero;
         switch (selectedHero) {
             case "SHANA":
-                this.hp = 8;
+                this.hp = 80;
                 this.speed = 8;
                 break;
             case "DIAMOND":
-                this.hp = 14;
+                this.hp = 140;
                 this.speed = 2;
                 break;
             case "LILITH":
-                this.hp = 10;
+                this.hp = 100;
                 this.speed = 6;
                 break;
             case "SCARLET":
-                this.hp = 6;
+                this.hp = 60;
                 this.speed = 10;
                 break;
             case "DASHER":
-                this.hp = 12;
+                this.hp = 120;
                 this.speed = 20;
                 break;
             default:

@@ -29,6 +29,11 @@ public class EyebatMonster extends Monster {
         lastShotTime = now;
     }
 
+    @Override
+    protected double getOriginalRadius() {
+        return 12;
+    }
+
 
     @Override
     public void attack() {

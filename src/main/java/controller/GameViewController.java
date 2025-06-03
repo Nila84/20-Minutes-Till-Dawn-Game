@@ -77,30 +77,76 @@ public class GameViewController {
         keyBindings.put(action, keyCode);
     }
 
+//    public static void setupMovementControls(Scene scene, Circle player, double speed) {
+//        final boolean[] upPressed = {false};
+//        final boolean[] downPressed = {false};
+//        final boolean[] leftPressed = {false};
+//        final boolean[] rightPressed = {false};
+//
+//        scene.setOnKeyPressed(event -> {
+//            KeyCode keyCode = event.getCode();
+//
+//            if (keyCode == getKeyBinding("UP")) upPressed[0] = true;
+//            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = true;
+//            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = true;
+//            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = true;
+//
+//            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
+//        });
+//
+//        scene.setOnKeyReleased(event -> {
+//            KeyCode keyCode = event.getCode();
+//
+//            if (keyCode == getKeyBinding("UP")) upPressed[0] = false;
+//            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = false;
+//            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = false;
+//            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = false;
+//
+//            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
+//        });
+//    }
+
     public static void setupMovementControls(Scene scene, Circle player, double speed) {
         final boolean[] upPressed = {false};
         final boolean[] downPressed = {false};
         final boolean[] leftPressed = {false};
         final boolean[] rightPressed = {false};
+        final boolean[] isMoving = {false};
 
         scene.setOnKeyPressed(event -> {
             KeyCode keyCode = event.getCode();
+            boolean wasMoving = isMoving[0];
 
             if (keyCode == getKeyBinding("UP")) upPressed[0] = true;
             else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = true;
             else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = true;
             else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = true;
 
+            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
+
+            // شروع انیمیشن هنگام شروع حرکت
+            if (isMoving[0] && !wasMoving) {
+                GameScreen.getInstance().startPulseAnimation();
+            }
+
             updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
         });
 
         scene.setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
+            boolean wasMoving = isMoving[0];
 
             if (keyCode == getKeyBinding("UP")) upPressed[0] = false;
             else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = false;
             else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = false;
             else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = false;
+
+            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
+
+            // توقف انیمیشن هنگام توقف حرکت
+            if (!isMoving[0] && wasMoving) {
+                GameScreen.getInstance().stopPulseAnimation();
+            }
 
             updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
         });
