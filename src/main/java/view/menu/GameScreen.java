@@ -1,8 +1,9 @@
 package view.menu;
-
+//
 import controller.App;
 import controller.GameController;
 import controller.GameViewController;
+import controller.SavedGameData;
 import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.*;
 
+import javax.swing.plaf.PanelUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,7 +41,7 @@ public class GameScreen {
     private long lastTentacleSpawnTime = 0;
     private long lastEyebatSpawnTime = 0;
     private int eyebatSpawnCount = 0;
-    private List<Bullet> bullets = new ArrayList<>();
+    private static List<Bullet> bullets = new ArrayList<>();
     private List<BulletForMonster> activeBullets = new ArrayList<>();
     private List<ExperienceOrb> experienceOrbs = new ArrayList<>();
     private List<Particle> particles = new ArrayList<>();
@@ -52,25 +54,25 @@ public class GameScreen {
     private long lastSpawnTime = 0;
     private long lastSpeedIncreaseTime = 0;
     public static boolean isMute = false;
-    private boolean isImmune = false;
-    private long immuneStartTime = 0;
+    private static boolean isImmune = false;
+    private static long immuneStartTime = 0;
     //آسیب ناپذیری پلیر
     private static final long IMMUNE_DURATION = 2000;
-    private Hero hero;
-    private static Ability ability;
-    private Weapon weapon;
+    private static Hero hero;
+    public static Ability ability;
+    public Weapon weapon;
     private Text hpText;
     private Text kills;
     private Text weaponNum;
     private Text abilityType;
     private static Text levell;
-    public Circle player;
+    private static Circle player;
     public static Pane gamePane;
     private Text timeText;
     private static long startTime;
     public static long startTime2;
     private static int gameDuration;
-    public AnimationTimer gameTimer;
+    public static AnimationTimer gameTimer;
     private static List<Monster> monsters = new ArrayList<>();
     private boolean canShootAuto = false;
     private HBox levelProgressBar;
@@ -78,6 +80,7 @@ public class GameScreen {
     public AnimationTimer gameLoop;
     private static boolean busFight = false;
     private static boolean canBussFight = true;
+
 
     public GameScreen() {
         instance = this;
@@ -110,6 +113,10 @@ public class GameScreen {
     public static void setMonsters(List<Monster> monstersList) {
         monsters.clear();
         monsters.addAll(monstersList);
+    }
+
+    public static void setHero(Hero hero) {
+        GameScreen.hero = hero;
     }
 
     public static Ability getAbility() {
@@ -199,7 +206,11 @@ public class GameScreen {
 
     public void addMonsterToGame(Monster monster) {
         monsters.add(monster);
-        gamePane.getChildren().add(monster.getShape());
+        if (!gamePane.getChildren().contains(monster.getShape())) {
+            gamePane.getChildren().add(monster.getShape());
+        }
+        monster.updatePosition();
+//        gamePane.getChildren().add(monster.getShape());
     }
 
     public void addMonster(Monster monster) {
@@ -214,6 +225,7 @@ public class GameScreen {
         this.weapon = weapon;
         this.gameDuration = minutes * 60;
         this.startTime = System.currentTimeMillis();
+        System.out.println("timmmme" + startTime);
         startTime2 = startTime;
         this.ability = ability;
 
@@ -367,6 +379,7 @@ public class GameScreen {
                 gamePane.getChildren().add(monster.getShape());
             }
         }
+
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -376,7 +389,7 @@ public class GameScreen {
                 }
 
                 // آپدیت UI (مثل تایمر، HP، کیلس و ... اگر لازم است)
-                updateGameUI();
+//                updateGameUI();
             }
         };
         gameLoop.start();
@@ -391,21 +404,20 @@ public class GameScreen {
         gamePane.requestFocus();
     }
 
-    private void updateGameUI() {
-        // به روز رسانی متن‌ها یا سایر المان‌های UI در هر فریم
+    void updateGameUI(SavedGameData savedData) {
         long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
         long remaining = Math.max(gameDuration - elapsedSeconds, 0);
         timeText.setText("Time: " + remaining + "s");
         hpText.setText("HP: " + hero.getHp());
-//        kills.setText("Kills: " + User.killNum);
-        weaponNum.setText("Weapon: " + weapon.getName());
-        abilityType.setText("Ability: " + ability.getName());
+        kills.setText("Kills: " + savedData.getKills());
+        weaponNum.setText("Weapon: " + savedData.getWeaponName());
+        abilityType.setText("Ability: " + savedData.getAbilityName());
         levell.setText("Level: " + User.level);
     }
 
     private void addObstacles() {
         Random rand = new Random();
-        int numberOfObstacles = 4; // مثلا 4 تا درخت
+        int numberOfObstacles = 4;
 
         for (int i = 0; i < numberOfObstacles; i++) {
             double radius = 15;
@@ -418,7 +430,7 @@ public class GameScreen {
         }
     }
 
-    private void checkPlayerObstacleCollision() {
+    public void checkPlayerObstacleCollision() {
         double px = player.getCenterX();
         double py = player.getCenterY();
         double pr = player.getRadius();
@@ -433,11 +445,11 @@ public class GameScreen {
             double distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance < pr + or) {
-                if (!isImmune) {  // اگر آسیب‌ناپذیر نیست
-                    hero.setHp(-o.getDamageOnCollision()); // ۲ واحد کم کن
+                if (!isImmune) {
+                    hero.setHp(-o.getDamageOnCollision());
                     isImmune = true;
                     immuneStartTime = System.currentTimeMillis();
-//                    updateHpText();  // فرض بر این است که این متد به روزرسانی متن جون است
+//                    updateHpText();
                 }
             }
         }
@@ -565,7 +577,7 @@ public class GameScreen {
         gameTimer.start();
     }
 
-    private void checkBussFight() {
+    public void checkBussFight() {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         if (elapsedTime >= gameDuration / 2 && canBussFight) {
             spawnElderMonster();
@@ -592,7 +604,7 @@ public class GameScreen {
         return new ElderMonster(x, y, Color.ORANGE);
     }
 
-    private void updateBullets() {
+    public void updateBullets() {
         List<Bullet> toRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
             bullet.update();
@@ -605,7 +617,7 @@ public class GameScreen {
     }
 
 
-    private void checkBulletCollision() {
+    public void checkBulletCollision() {
         List<Bullet> toRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
             double dx = player.getCenterX() - bullet.getShape().getCenterX();
@@ -633,7 +645,7 @@ public class GameScreen {
     }
 
 
-    private void checkBulletCollisionMonster() {
+    public void checkBulletCollisionMonster() {
         List<BulletForMonster> bulletsToRemove = new ArrayList<>();
         List<Monster> monstersToRemove = new ArrayList<>();
 
@@ -672,7 +684,7 @@ public class GameScreen {
         monstersToRemove.forEach(m -> gamePane.getChildren().remove(m.getShape()));
     }
 
-    private void checkExperienceOrbCollection() {
+    public void checkExperienceOrbCollection() {
         List<ExperienceOrb> orbsToRemove = new ArrayList<>();
 
         for (ExperienceOrb orb : experienceOrbs) {
@@ -782,7 +794,7 @@ public class GameScreen {
         return button;
     }
 
-    private void checkMonsterSpeedIncrease() {
+    public void checkMonsterSpeedIncrease() {
         boolean done = false;
         long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
         if (elapsedSeconds - lastSpeedIncreaseTime >= 5) {
@@ -797,7 +809,7 @@ public class GameScreen {
     }
 
 
-    private void updateGameTime() {
+    public void updateGameTime() {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         long remainingTime = gameDuration - elapsedTime;
 
@@ -818,7 +830,7 @@ public class GameScreen {
         levell.setText("Level: " + App.getCurrentUser().level);
     }
 
-    private void updateMonsters() {
+    public static void updateMonsters() {
         long now = System.currentTimeMillis();
         double playerX = player.getCenterX();
         double playerY = player.getCenterY();
@@ -863,7 +875,7 @@ public class GameScreen {
         }
     }
 
-    private void addImmuneEffect() {
+    private static void addImmuneEffect() {
         Timeline blinkTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(player.fillProperty(), Color.WHITE)
@@ -883,7 +895,7 @@ public class GameScreen {
         player.setEffect(glow);
     }
 
-    private void checkTentacleMonsterSpawn() {
+    public void checkTentacleMonsterSpawn() {
         long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
 
         if (elapsedSeconds >= 30) {
@@ -900,7 +912,7 @@ public class GameScreen {
             }
         }
     }
-    private void checkEyebatMonsterSpawn() {
+    public void checkEyebatMonsterSpawn() {
         long elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000;
         int totalGameSeconds = gameDuration;
 
@@ -913,7 +925,7 @@ public class GameScreen {
             }
         }
     }
-    private void showGameOverScreen() {
+    private static void showGameOverScreen() {
         long survivalTime = System.currentTimeMillis() - startTime;
         App.getCurrentUser().updateSurvivalTime(survivalTime);
         Pane resultPane = new Pane();
@@ -1044,7 +1056,7 @@ public class GameScreen {
         stage.setScene(resultScene);
     }
 
-    public void back() {
+    public static void back() {
         try {
             new MainMenu().start(LoginMenu.stageOfProgram);
         }catch (Exception e) {
@@ -1102,7 +1114,7 @@ public class GameScreen {
 
         System.out.println("Bullet added successfully. Total bullets: " + activeBullets.size());
     }
-    private void updateBulletsForMonster() {
+    public void updateBulletsForMonster() {
         System.out.println("Updating bullets. Count: " + activeBullets.size());
 
         List<BulletForMonster> toRemove = new ArrayList<>();
@@ -1264,7 +1276,7 @@ public class GameScreen {
         }
     }
 
-    private void updateParticles() {
+    public void updateParticles() {
         List<Particle> toRemove = new ArrayList<>();
 
         for (Particle p : particles) {
@@ -1278,7 +1290,7 @@ public class GameScreen {
         particles.removeAll(toRemove);
     }
 
-    private void checkImmunity() {
+    public void checkImmunity() {
         if (isImmune && System.currentTimeMillis() - immuneStartTime >= IMMUNE_DURATION) {
             isImmune = false;
             player.setEffect(null);
@@ -1329,7 +1341,7 @@ public class GameScreen {
         }
     }
 
-    public Circle getPlayer() {
+    public static Circle getPlayer() {
         return player;
     }
 

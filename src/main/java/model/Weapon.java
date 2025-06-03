@@ -9,7 +9,7 @@ public class Weapon {
     private double reloadTime; // به ثانیه
     private int projectileCount;
     private int damagePerProjectile;
-    private int currentAmmo;
+    private static int currentAmmo;
     private boolean isReloading;
     private long reloadStartTime;
     private boolean autoReload;
@@ -108,7 +108,7 @@ public class Weapon {
 
     public String getName() { return name; }
     public int getMaxAmmo() { return maxAmmo; }
-    public int getCurrentAmmo() { return currentAmmo; }
+    public static int getCurrentAmmo() { return currentAmmo; }
     public double getReloadTime() { return reloadTime; }
     public int getProjectileCount() { return projectileCount; }
     public int getDamagePerProjectile() { return damagePerProjectile; }
@@ -132,6 +132,10 @@ public class Weapon {
 
     public int getTotalDamage() {
         return projectileCount * damagePerProjectile;
+    }
+
+    public static void setCurrentAmmo(int currentAmmo) {
+        Weapon.currentAmmo = currentAmmo;
     }
 
     public static Weapon[] getAllWeapons() {

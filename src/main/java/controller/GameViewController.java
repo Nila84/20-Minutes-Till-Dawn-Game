@@ -286,7 +286,6 @@ public class GameViewController {
         });
 
         changeTheme.setOnAction(e -> {
-            //TODO
             changeTheme(gamePane);
         });
 
@@ -303,6 +302,7 @@ public class GameViewController {
                             (monster.getX(), monster.getY(), monster.getClass().getSimpleName()));
                 }
 
+                Circle player = GameScreen.getInstance().getPlayer();
                 User currentUser = App.getCurrentUser();
                 int xp = currentUser.getXP();
                 int hp = currentUser.getSelectedHero().getHp();
@@ -315,8 +315,10 @@ public class GameViewController {
                 String weaponName = App.getCurrentUser().getSelectedWeapon().getName();
                 String abilityName = GameScreen.getAbility().getName();
                 SavedGameData savedData = new SavedGameData(
-                        currentUser.getUsername(), hp, xp, level, kills, remainingTime,
-                        enemyDataList, heroName,weaponName,abilityName
+                        currentUser.getUsername(), hp, xp, level, kills, remainingTime,GameScreen.getGameDuration(),
+                        enemyDataList, heroName,weaponName,abilityName,player.getCenterX(),
+                        player.getCenterY(),
+                        Weapon.getCurrentAmmo()
                 );
 
                 new File("saves").mkdirs();

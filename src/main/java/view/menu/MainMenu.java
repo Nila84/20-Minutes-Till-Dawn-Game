@@ -12,6 +12,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
 import model.Monster;
@@ -20,6 +22,7 @@ import view.Paths;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import model.Weapon;
 
 public class MainMenu extends Application {
     @FXML
@@ -29,6 +32,8 @@ public class MainMenu extends Application {
     @FXML
     private Label scoreLabel;
 
+    private Circle player;
+    public static boolean loadGame = false;
 
 
     @Override
@@ -103,7 +108,7 @@ public class MainMenu extends Application {
             try {
                 new TalentMenu().start(LoginMenu.stageOfProgram);
             } catch (Exception e) {
-                e.printStackTrace(); // خطا را کامل چاپ کنید
+                e.printStackTrace();
                 System.out.println("Error opening TalentMenu: " + e.getMessage());
             }
         }
@@ -151,28 +156,38 @@ public class MainMenu extends Application {
                 return;
             }
 
-            // بازیابی اطلاعات کاربر
-            currentUser.setXP(savedData.getXp());
-            currentUser.getSelectedHero().setHp(savedData.getHp());
-            User.level = savedData.getLevel();
-            currentUser.killNum = savedData.getKills();
+//            currentUser.setXP(savedData.getXp());
+//            System.out.println("****" + savedData.getHp());
+//            currentUser.getSelectedHero().setHp(savedData.getHp());
+//            System.out.println( currentUser.getSelectedHero().getHp());
+//            User.level = savedData.getLevel();
+//            currentUser.killNum = savedData.getKills();
 
-            // ست کردن تایمر بازی
             GameScreen.setStartTime(System.currentTimeMillis());
             GameScreen.setGameDuration((int) (savedData.getRemainingTime() / 1000L));
 
-            // بازسازی لیست دشمن‌ها
-            List<Monster> restoredMonsters = new ArrayList<>();
-            for (EnemyData enemyData : savedData.getEnemyDataList()) {
-                Monster monster = GameViewController.createMonsterFromType(enemyData.getType(), enemyData.getX(), enemyData.getY());
-                if (monster != null) {
-                    restoredMonsters.add(monster);
-                }
-            }
-            GameScreen.setMonsters(restoredMonsters);
+//            List<Monster> restoredMonsters = new ArrayList<>();
+//            for (EnemyData enemyData : savedData.getEnemyDataList()) {
+//                Monster monster = GameViewController.createMonsterFromType
+//                        (enemyData.getType(), enemyData.getX(), enemyData.getY());
+//                if (monster != null) {
+//                    restoredMonsters.add(monster);
+//                }
+//            }
+//            GameScreen.setMonsters(restoredMonsters);
 
-            // اجرای بازی
-            PreGameMenu.startResumedGame(savedData); // false = نیازی به نمایش انتخاب هیرو نیست
+            if (currentUser.getSelectedHero().getName().equals("SHANA")) player = new Circle(15, Color.PURPLE);
+            else if (currentUser.getSelectedHero().getName().equals("DIAMOND")) player = new Circle(15, Color.PINK);
+            else if (currentUser.getSelectedHero().getName().equals("LILITH")) player = new Circle(15, Color.GREEN);
+            else if (currentUser.getSelectedHero().getName().equals("SCARLET")) player = new Circle(15, Color.GRAY);
+            else if (currentUser.getSelectedHero().getName().equals("DASHER")) player = new Circle(15, Color.BLUE);
+            player.setCenterX(savedData.getPlayerX());
+            player.setCenterY(savedData.getPlayerY());
+
+            Weapon.setCurrentAmmo(savedData.getAmmoCount());
+            loadGame = true;
+
+            PreGameMenu.startResumedGame(savedData);
 
         } catch (Exception e) {
             e.printStackTrace();

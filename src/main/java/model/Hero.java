@@ -54,6 +54,9 @@ public class Hero {
     public void setHp(int hp) {
         this.hp += hp;
     }
+    public void setHp2(int hp) {
+        this.hp = hp;
+    }
 
     public void setSpeed(int speed) {
         this.speed = speed;

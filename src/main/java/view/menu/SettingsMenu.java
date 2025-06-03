@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import view.Paths;
 
@@ -126,5 +127,13 @@ public class SettingsMenu extends Application {
 
     public void autoReload(MouseEvent mouseEvent) {
         GameViewController.autoReload = !GameViewController.autoReload;
+    }
+
+    private void refreshUI() {
+        try {
+            new SettingsMenu().start(LoginMenu.stageOfProgram);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

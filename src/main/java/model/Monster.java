@@ -42,6 +42,23 @@ public abstract class Monster {
         this.shape.setCenterY(y);
     }
 
+    public void move(double targetX, double targetY) {
+        // محاسبه جهت حرکت
+        double dx = targetX - this.x;
+        double dy = targetY - this.y;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 0) {
+            // به‌روزرسانی موقعیت منطقی
+            this.x += (dx / distance) * speed;
+            this.y += (dy / distance) * speed;
+
+            // به‌روزرسانی موقعیت گرافیکی
+            shape.setCenterX(this.x);
+            shape.setCenterY(this.y);
+        }
+    }
+
     public Circle getShape() {
         return shape;
     }
@@ -129,6 +146,12 @@ public abstract class Monster {
             setY(originalY);
             isKnockback = false;
         }
+    }
+
+    public void updatePosition() {
+        // همگام‌سازی موقعیت گرافیکی با موقعیت منطقی
+        shape.setCenterX(this.x);
+        shape.setCenterY(this.y);
     }
 
     public void setX(double x) {

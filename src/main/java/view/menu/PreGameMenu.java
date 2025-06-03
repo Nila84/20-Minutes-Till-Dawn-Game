@@ -1,6 +1,7 @@
 package view.menu;
 
 import controller.*;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import model.*;
 import view.Paths;
@@ -129,6 +131,7 @@ public class PreGameMenu extends Application {
             currentStage.close();
             theTime = selectedTime;
             int level = User.level;
+            System.out.println("start timee " + selectedTime);
             new GameScreen().start(new Stage(),selectedTime,hero,weapon, ability,level);
         } catch (Exception e) {
             System.err.println("Error in startGame: " + e.getMessage());
@@ -156,10 +159,12 @@ public class PreGameMenu extends Application {
 
     public static void startResumedGame(SavedGameData savedData) {
         try {
+
             User user = App.getCurrentUser();
             Hero hero = new Hero(savedData.getHeroName());
             Weapon weapon = new Weapon(savedData.getWeaponName());
             Ability ability = new Ability(savedData.getAbilityName());
+
 
             weapon2 = weapon;
             ability2 = ability;
@@ -168,14 +173,20 @@ public class PreGameMenu extends Application {
             user.setSelectedWeapon(weapon);
             User.level = savedData.getLevel();
             user.setXP(savedData.getXp());
-            hero.setHp(savedData.getHp());
+            hero.setHp2(savedData.getHp() - 1);
+            System.out.println("**===" + hero.getHp());
             user.killNum = savedData.getKills();
 
             int remainingSeconds = (int) (savedData.getRemainingTime() / 1000L);
-            GameScreen.setGameDuration(remainingSeconds);
-            GameScreen.setStartTime(System.currentTimeMillis() - (remainingSeconds * 1000L));
+            long elapsedTime = (savedData.getTotalTime() * 1000L) - savedData.getRemainingTime();
+            GameScreen.setGameDuration(remainingSeconds /1000);
+            GameScreen.setStartTime((System.currentTimeMillis() - (remainingSeconds * 1000L))/1000);
 
-            List<Monster> restoredMonsters = new ArrayList<>();
+            GameScreen gameScreen = new GameScreen();
+            Stage gameStage = new Stage();
+            System.out.println("time remaining " + remainingSeconds);
+            gameScreen.start(gameStage, remainingSeconds / 60, hero, weapon, ability, savedData.getLevel());
+
             for (EnemyData enemyData : savedData.getEnemyDataList()) {
                 Monster monster = GameViewController.createMonsterFromType(
                         enemyData.getType(),
@@ -183,23 +194,65 @@ public class PreGameMenu extends Application {
                         enemyData.getY()
                 );
                 if (monster != null) {
-                    restoredMonsters.add(monster);
+                    monster.getShape().setCenterX(enemyData.getX());
+                    monster.getShape().setCenterY(enemyData.getY());
+                    gameScreen.addMonster(monster);
                 }
             }
-            GameScreen.setMonsters(restoredMonsters);
 
-            GameScreen gameScreen = new GameScreen();
-            gameScreen.start(
-                    new Stage(),
-                    remainingSeconds,
-                    hero,
-                    weapon,
-                    ability,
-                    savedData.getLevel()
+            if (savedData.getPlayerX() != 0 && savedData.getPlayerY() != 0) {
+                Circle player = gameScreen.getPlayer();
+                if (player != null) {
+                    player.setCenterX(savedData.getPlayerX());
+                    player.setCenterY(savedData.getPlayerY());
+                }
+            }
+            // 8. تنظیم زمان بازی
+//            gameScreen.setStartTime((System.currentTimeMillis() - elapsedTime)/1000);
+
+            GameViewController.setupMovementControls(
+                    gameScreen.getGamePane().getScene(),
+                    gameScreen.getPlayer(),
+                    hero.getSpeed()
             );
+
 
             if (gameScreen.gameTimer != null) gameScreen.gameTimer.stop();
             if (gameScreen.gameLoop != null) gameScreen.gameLoop.stop();
+            gameScreen.gameLoop = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    if (!GameController.isPaused) {
+//                        gameScreen.checkBussFight();
+//                        gameScreen.checkPlayerObstacleCollision();
+//                        gameScreen.checkImmunity();
+//                        gameScreen.weapon.updateReload();
+//                        gameScreen.ability.update();
+//                        gameScreen.updateGameTime();
+//                        gameScreen.updateMonsters();
+//                        gameScreen.updateBullets();
+//                        gameScreen.updateBulletsForMonster();
+//                        gameScreen.updateParticles();
+//                        gameScreen.checkBulletCollision();
+//                        gameScreen.checkBulletCollisionMonster();
+//                        gameScreen.checkExperienceOrbCollection();
+//                        gameScreen.checkTentacleMonsterSpawn();
+//                        gameScreen.checkEyebatMonsterSpawn();
+//                        gameScreen.checkMonsterSpeedIncrease();
+//                        gameScreen.monsters.forEach(Monster::updateKnockback);
+                        for (Monster monster : GameScreen.getMonsters()) {
+                            if (monster.isAlive()) {
+                                monster.move(
+                                        gameScreen.getPlayer().getCenterX(),
+                                        gameScreen.getPlayer().getCenterY()
+                                );
+                                monster.updatePosition();
+                            }
+                        }
+//                        gameScreen.updateGameUI(savedData);
+                    }
+                }
+            };
             gameScreen.startGameTimer();
             gameScreen.gameLoop.start();
 
