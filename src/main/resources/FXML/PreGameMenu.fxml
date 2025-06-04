@@ -2,43 +2,21 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="view.menu.PreGameMenu"
-            prefWidth="700" prefHeight="700"
             stylesheets="@../CSS/commonStyles.css"
-            styleClass="Background">
-
+            styleClass="Background"
+            prefHeight="700.0" prefWidth="700.0">
     <center>
-        <VBox alignment="CENTER" spacing="20">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-
-            <Label text="Select Your Hero:" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-            <VBox fx:id="heroesBox" spacing="10" alignment="CENTER_LEFT">
-                <padding>
-                    <Insets left="20"/>
-                </padding>
-            </VBox>
-
-            <Label text="Select Your Weapon:" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-            <VBox fx:id="weaponsBox" spacing="10" alignment="CENTER_LEFT">
-                <padding>
-                    <Insets left="20"/>
-                </padding>
-            </VBox>
-
-            <Label text="Select Game Time (minutes):" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
-            <Slider fx:id="timeSlider" prefWidth="300"/>
-            <Label fx:id="timeLabel" style="-fx-font-size: 14;"/>
-
-            <Button text="Start Game" onAction="#startGame"
-                    style="-fx-font-size: 16; -fx-pref-width: 150; -fx-pref-height: 40;"/>
-            <Button onMouseClicked="#back" text="Back" />
-
+        <VBox alignment="CENTER" spacing="40">
+            <VBox fx:id="heroesBox" alignment="CENTER" spacing="10"/>
+            <VBox fx:id="weaponsBox" alignment="CENTER" spacing="10"/>
+            <Slider fx:id="timeSlider"/>
+            <Label fx:id="timeLabel"/>
+            <Button fx:id="startButton" onAction="#startGame"/>
+            <Button fx:id="backButton" onAction="#back"/>
         </VBox>
     </center>
 </BorderPane>
