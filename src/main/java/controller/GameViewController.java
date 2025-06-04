@@ -213,6 +213,7 @@ public class GameViewController {
 
 
     public static void changeToNextMusic() {
+//        mediaPlayer.setMute(GameMenu.isMute);
         currentSongIndex = (currentSongIndex + 1) % musicFileNames.size();
 
         String filePath = Paths.MUSICS_PATH.getPath() + musicFileNames.get(currentSongIndex);

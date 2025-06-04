@@ -1,75 +1,124 @@
 package view.menu;
 
-
 import controller.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.fxml.FXML;
-import model.Monster;
-import model.User;
+import model.*;
 import view.Paths;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import model.Weapon;
+import view.enums.MainMenuText;
 
 public class MainMenu extends Application {
-    @FXML
     private ImageView avatarImageView;
-    @FXML
     private Label usernameLabel;
-    @FXML
     private Label scoreLabel;
-
     private Circle player;
     public static boolean loadGame = false;
-
+    private boolean isEnglish = GameController.language;
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL mainMenuFXMLUrl = MainMenu.class.getResource(Paths.MAIN_MENU_FXML_FILE.getPath());
-        BorderPane borderPane = FXMLLoader.load(mainMenuFXMLUrl);
+        createUIComponents();
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(createTopBar());
+        borderPane.setCenter(createCenterMenu());
+        borderPane.getStyleClass().add("Background");
+
         if (GameViewController.isBlackWhiteThemeOn) {
             borderPane.getStylesheets().remove(getClass().getResource(
                     Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
             borderPane.getStylesheets().add(getClass().getResource(
                     Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
+        } else {
+            borderPane.getStylesheets().add(getClass().getResource(
+                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
         }
-        Scene mainMenuScene = new Scene(borderPane);
+        Scene mainMenuScene = new Scene(borderPane, 700, 700);
         stage.setScene(mainMenuScene);
         stage.show();
     }
 
-    @FXML
-    public void initialize() {
+    private void createUIComponents() {
+        avatarImageView = new ImageView();
+        avatarImageView.setFitWidth(60);
+        avatarImageView.setFitHeight(60);
+
+        usernameLabel = new Label();
+        usernameLabel.getStyleClass().add("username-label");
+
+        scoreLabel = new Label();
+        scoreLabel.getStyleClass().add("score-label");
+    }
+
+    private HBox createTopBar() {
+        HBox topBar = new HBox(20);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(10));
+        topBar.getStyleClass().add("user-info-box");
+
         User currentUser = App.getCurrentUser();
         if (currentUser != null) {
             usernameLabel.setText(currentUser.getUsername());
-            scoreLabel.setText("Score: " + currentUser.getScore());
+            scoreLabel.setText(getText(MainMenuText.SCORE_EN) + currentUser.getScore());
+
             try {
-                String path = currentUser.getAvatarFilePath(); // fix slashes
+                String path = currentUser.getAvatarFilePath();
                 Image avatarImage = new Image(path);
                 avatarImageView.setImage(avatarImage);
             } catch (Exception e) {
-                System.out.println("Could not load avatar from file system: " + e.getMessage());
+                System.out.println("Could not load avatar: " + e.getMessage());
             }
-
-
         }
+
+        VBox userInfoBox = new VBox();
+        userInfoBox.getChildren().addAll(usernameLabel, scoreLabel);
+
+        topBar.getChildren().addAll(avatarImageView, userInfoBox);
+        return topBar;
     }
 
+    private VBox createCenterMenu() {
+        VBox centerMenu = new VBox(40);
+        centerMenu.setAlignment(Pos.CENTER);
+        centerMenu.getStyleClass().add("mainMenuButtons");
 
+        Button talentButton = createMenuButton(getText(MainMenuText.TALENT_MENU_EN), this::talentMenu);
+        Button preGameButton = createMenuButton(getText(MainMenuText.PRE_GAME_EN), this::preGameMenu);
+        Button resumeButton = createMenuButton(getText(MainMenuText.RESUME_GAME_EN), this::resumingPreviousGame);
+        Button profileButton = createMenuButton(getText(MainMenuText.PROFILE_MENU_EN), this::profileMenu);
+        Button scoreboardButton = createMenuButton(getText(MainMenuText.SCOREBOARD_EN), this::scoreBoardMenu);
+        Button settingsButton = createMenuButton(getText(MainMenuText.SETTINGS_EN), this::settings);
+        Button logoutButton = createMenuButton(getText(MainMenuText.LOGOUT_EN), this::logout);
+        Button exitButton = createMenuButton(getText(MainMenuText.EXIT_EN), this::exit);
+
+        centerMenu.getChildren().addAll(
+                talentButton, preGameButton, resumeButton,
+                profileButton, scoreboardButton, settingsButton,
+                logoutButton, exitButton
+        );
+
+        return centerMenu;
+    }
+
+    private Button createMenuButton(String text, javafx.event.EventHandler<MouseEvent> handler) {
+        Button button = new Button(text);
+        button.setOnMouseClicked(handler);
+        return button;
+    }
+
+    private String getText(MainMenuText textType) {
+        return MainMenuText.getText(textType, isEnglish);
+    }
 
     public void exit(MouseEvent mouseEvent) {
         System.exit(0);
@@ -90,7 +139,6 @@ public class MainMenu extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void profileMenu(MouseEvent mouseEvent) {
@@ -100,9 +148,9 @@ public class MainMenu extends Application {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
+
     public void talentMenu(MouseEvent mouseEvent) {
         if (App.isStayLoggedIn()) {
             try {
@@ -113,14 +161,12 @@ public class MainMenu extends Application {
             }
         }
     }
+
     public void preGameMenu(MouseEvent mouseEvent) {
         try {
             if (!App.isStayLoggedIn()) {
-                User user = new User
-                        ("Guest111" , "Guest2222","jdbchsjvb","red");
+                User user = new User("Guest111", "Guest2222", "jdbchsjvb", "red");
                 App.setCurrentUser(user);
-                //TODO : فعال کردن حالتی برای گست
-//                showAlert("Access Denied", "You must be logged in to access the Pre-Game Menu.");
                 return;
             }
 
@@ -129,7 +175,7 @@ public class MainMenu extends Application {
         } catch (Exception e) {
             System.err.println("Error opening PreGameMenu: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Error", "Failed to open Pre-Game Menu: " + e.getMessage());
+            showAlert(getText(MainMenuText.ERROR_EN), "Failed to open Pre-Game Menu: " + e.getMessage());
         }
     }
 
@@ -143,7 +189,10 @@ public class MainMenu extends Application {
 
     public void resumingPreviousGame(MouseEvent mouseEvent) {
         if (!App.isStayLoggedIn()) {
-            showAlert("Access Denied", "You must be logged in to resume a saved game.");
+            showAlert(
+                    getText(MainMenuText.ACCESS_DENIED_EN),
+                    getText(MainMenuText.MUST_LOGIN_EN)
+            );
             return;
         }
 
@@ -152,7 +201,10 @@ public class MainMenu extends Application {
             SavedGameData savedData = GameViewController.loadSavedGame(currentUser.getUsername());
 
             if (savedData == null) {
-                showAlert("No Save Found", "No saved game found for this user.");
+                showAlert(
+                        getText(MainMenuText.NO_SAVE_EN),
+                        "No saved game found for this user."
+                );
                 return;
             }
 
@@ -174,7 +226,7 @@ public class MainMenu extends Application {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to resume game: " + e.getMessage());
+            showAlert(getText(MainMenuText.ERROR_EN), "Failed to resume game: " + e.getMessage());
         }
     }
 
@@ -184,7 +236,6 @@ public class MainMenu extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public static void show() {
@@ -194,5 +245,4 @@ public class MainMenu extends Application {
             System.out.println("Error returning to main menu: " + e.getMessage());
         }
     }
-
 }
