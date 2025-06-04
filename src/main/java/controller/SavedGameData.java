@@ -14,8 +14,8 @@ public class SavedGameData implements Serializable {
     private String heroName;
     private String weaponName;
     private String abilityName;
-    private double playerX; // اضافه شود
-    private double playerY; // اضافه شود
+    private double playerX;
+    private double playerY;
     private int ammoCount;
     private long totalTime;
 

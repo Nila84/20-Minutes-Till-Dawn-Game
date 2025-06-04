@@ -3,9 +3,8 @@ module tillDawn {
     requires javafx.fxml;
     requires com.google.gson;
     requires java.desktop;
-    requires java.logging;
-    requires java.base;
     requires javafx.media;
+    requires java.logging;
 
     exports view.menu;
     exports controller;

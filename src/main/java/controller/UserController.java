@@ -157,5 +157,4 @@ public class UserController {
             DBController.saveCurrentUser();
         }
     }
-
 }
