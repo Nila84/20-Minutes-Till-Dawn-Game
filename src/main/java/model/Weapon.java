@@ -6,7 +6,7 @@ import view.menu.GameMenu;
 public class Weapon {
     private final String name;
     private int maxAmmo;
-    private double reloadTime; // به ثانیه
+    private double reloadTime;
     private int projectileCount;
     private int damagePerProjectile;
     private static int currentAmmo;
@@ -112,8 +112,6 @@ public class Weapon {
     public double getReloadTime() { return reloadTime; }
     public int getProjectileCount() { return projectileCount; }
     public int getDamagePerProjectile() { return damagePerProjectile; }
-    public boolean isReloading() { return isReloading; }
-    public boolean isAutoReload() { return autoReload; }
     public double getReloadProgress() {
         if (!isReloading) return 1.0;
         return Math.min(1.0, (System.currentTimeMillis() - reloadStartTime) / (reloadTime * 1000));
@@ -136,9 +134,5 @@ public class Weapon {
 
     public static void setCurrentAmmo(int currentAmmo) {
         Weapon.currentAmmo = currentAmmo;
-    }
-
-    public static Weapon[] getAllWeapons() {
-        return new Weapon[] { REVOLVER, SHOTGUN, SMG_DUAL };
     }
 }

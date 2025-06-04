@@ -10,6 +10,7 @@ public class GameController {
     public static boolean isPaused = false;
     public static int timeOfGame;
     public static long time;
+    public static boolean language = true;
 
     private List<Monster> monsters;
     private User player;

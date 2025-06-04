@@ -31,7 +31,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.*;
-
 import javax.swing.plaf.PanelUI;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,6 @@ import java.util.Random;
 
 public class GameScreen {
     private long lastTentacleSpawnTime = 0;
-    private long lastEyebatSpawnTime = 0;
     private int eyebatSpawnCount = 0;
     public static List<Bullet> bullets = new ArrayList<>();
     private List<BulletForMonster> activeBullets = new ArrayList<>();
@@ -48,19 +46,14 @@ public class GameScreen {
     public static List<Obstacle> obstacles = new ArrayList<>();
     private static GameScreen instance;
     private static final int PLAYER_RADIUS = 15;
-    private static final double MOVEMENT_SPEED = 5.0;
     private static final int WIDTH = 1200;
     private static final int HEIGHT = 700;
-    private long lastSpawnTime = 0;
     private long lastSpeedIncreaseTime = 0;
     public static boolean isMute = false;
     private static boolean isImmune = false;
     private static boolean isImmune2 = false;
     private static long immuneStartTime = 0;
-    private static final double PULSE_AMOUNT = 2.0;
-    private static final double PULSE_SPEED = 0.1;
     private Timeline pulseTimeline;
-
     private static final long IMMUNE_DURATION = 2000;
     private static Hero hero;
     public static Ability ability;
@@ -87,7 +80,6 @@ public class GameScreen {
     public static Rectangle barrier;
     public static boolean barrierActive = false;
     private static Timeline barrierTimeline;
-    private static final double INITIAL_BARRIER_SIZE = 100;
     private static final double BARRIER_SHRINK_DURATION = 30;
     private static final double MIN_BARRIER_SIZE = 200;
     private static final int BARRIER_DAMAGE = 2;
@@ -128,15 +120,6 @@ public class GameScreen {
 
     public List<ExperienceOrb> getExperienceOrbs() {
         return experienceOrbs;
-    }
-
-    public static void setMonsters(List<Monster> monstersList) {
-        monsters.clear();
-        monsters.addAll(monstersList);
-    }
-
-    public static void setHero(Hero hero) {
-        GameScreen.hero = hero;
     }
 
     public static Ability getAbility() {
@@ -230,7 +213,6 @@ public class GameScreen {
             gamePane.getChildren().add(monster.getShape());
         }
         monster.updatePosition();
-//        gamePane.getChildren().add(monster.getShape());
     }
 
     public void addMonster(Monster monster) {
@@ -270,11 +252,11 @@ public class GameScreen {
         else if (hero.getName().equals("LILITH")) player = new Circle(PLAYER_RADIUS, Color.GREEN);
         else if (hero.getName().equals("SCARLET")) player = new Circle(PLAYER_RADIUS, Color.GRAY);
         else if (hero.getName().equals("DASHER")) player = new Circle(PLAYER_RADIUS, Color.BLUE);
-        Pane viewportPane = new Pane(); // پنی که فقط بخش قابل مشاهده را نشان می‌دهد
+        Pane viewportPane = new Pane();
         viewportPane.setPrefSize(WIDTH, HEIGHT);
         viewportPane.setClip(new Rectangle(WIDTH, HEIGHT));
 
-        worldPane.getChildren().addAll(/* تمام المان‌های بازی */);
+        worldPane.getChildren().addAll();
         viewportPane.getChildren().add(worldPane);
 
         Scene scene = new Scene(viewportPane, WIDTH, HEIGHT);
@@ -284,32 +266,26 @@ public class GameScreen {
 
         timeText = new Text();
         timeText.setFont(new Font(20));
-//        timeText.setFill(Color.PINK);
         timeText.setLayoutX(WIDTH - 150);
         timeText.setLayoutY(30);
         hpText = new Text();
         hpText.setFont(new Font(20));
-//        hpText.setFill(Color.YELLOW);
         hpText.setLayoutX(WIDTH - 150);
-        hpText.setLayoutY(60); // پایین‌تر از تایمر
+        hpText.setLayoutY(60);
         kills = new Text();
         kills.setFont(new Font(20));
-//        kills.setFill(Color.GREEN);
         kills.setLayoutX(WIDTH - 150);
         kills.setLayoutY(90);
         weaponNum = new Text();
         weaponNum.setFont(new Font(15));
-//        weaponNum.setFill(Color.CYAN);
         weaponNum.setLayoutX(WIDTH - 150);
         weaponNum.setLayoutY(120);
         abilityType = new Text();
         abilityType.setFont(new Font(15));
-//        abilityType.setFill(Color.GREEN);
         abilityType.setLayoutX(WIDTH - 150);
         abilityType.setLayoutY(140);
         levell = new Text();
         levell.setFont(new Font(15));
-//        levell.setFill(Color.CYAN);
         levell.setLayoutX(WIDTH - 150);
         levell.setLayoutY(160);
 
@@ -329,7 +305,6 @@ public class GameScreen {
             abilityType.setFill(Color.GREEN);
             levell.setFill(Color.CYAN);
         }
-
 
         gamePane.getChildren().addAll(player, timeText);
         gamePane.getChildren().add(hpText);
@@ -351,7 +326,6 @@ public class GameScreen {
                 case K: shootInDirection(0, 1); break;
                 case J: shootInDirection(-1, 0); break;
                 case L: shootInDirection(1, 0); break;
-                // TODO :  8 جهت کنم
                 case SPACE: canShootAuto = !canShootAuto; break;
             }
         });
@@ -374,22 +348,6 @@ public class GameScreen {
                 shootInDirection(dx, dy);
             }
         });
-        //TODO : درست کردن موس
-
-//        Circle mousePointer = new Circle(5);
-//        mousePointer.setStrokeWidth(2);
-//        mousePointer.setVisible(false);
-//        gamePane.getChildren().add(mousePointer);
-//
-//        gamePane.setOnMouseMoved(event -> {
-//            mousePointer.setCenterX(event.getX());
-//            mousePointer.setCenterY(event.getY());
-//        });
-//
-//        gamePane.setOnMouseEntered(event -> mousePointer.setVisible(true));
-//        gamePane.setOnMouseExited(event -> mousePointer.setVisible(false));
-//
-
         addGlowToPlayer();
         addObstacles();
         initializeLevelProgressBar(gamePane);
@@ -410,11 +368,7 @@ public class GameScreen {
             }
         };
         gameLoop.start();
-
-
-
         startGameTimer();
-
         stage.setScene(scene);
         stage.setTitle("Game");
         stage.show();
@@ -473,7 +427,6 @@ public class GameScreen {
                     hero.setHp(-o.getDamageOnCollision());
                     isImmune = true;
                     immuneStartTime = System.currentTimeMillis();
-//                    updateHpText();
                 }
             }
         }
@@ -487,12 +440,9 @@ public class GameScreen {
         highlight.setStrokeWidth(3);
         highlight.setCenterX(target.getX());
         highlight.setCenterY(target.getY());
-
         Glow glow = new Glow(0.8);
         highlight.setEffect(glow);
-
         gamePane.getChildren().add(highlight);
-
         FadeTransition fade = new FadeTransition(Duration.seconds(0.5), highlight);
         fade.setFromValue(1.0);
         fade.setToValue(0);
@@ -555,13 +505,11 @@ public class GameScreen {
 
     private void animateBullet(BulletForMonster bullet) {
         Timeline animation = new Timeline(new KeyFrame(Duration.millis(10), event -> {
-            bullet.update(); // متد `update` برای حرکت طبیعی تیر
+            bullet.update();
         }));
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
     }
-
-
 
     private void spawnMonsters(int count) {
         for (int i = 0; i < count; i++) {
@@ -649,14 +597,6 @@ public class GameScreen {
         busFight = true;
     }
 
-    public static Monster createRandomElderMonster() {
-        Random random = new Random();
-        double x = random.nextDouble() * 800;
-        double y = random.nextDouble() * 600;
-        Color color;
-        return new ElderMonster(x, y, Color.ORANGE);
-    }
-
     public void updateBullets() {
         List<Bullet> toRemove = new ArrayList<>();
         for (Bullet bullet : bullets) {
@@ -668,7 +608,6 @@ public class GameScreen {
         }
         bullets.removeAll(toRemove);
     }
-
 
     public void checkBulletCollision() {
         List<Bullet> toRemove = new ArrayList<>();
@@ -696,7 +635,6 @@ public class GameScreen {
         }
         bullets.removeAll(toRemove);
     }
-
 
     public void checkBulletCollisionMonster() {
         List<BulletForMonster> bulletsToRemove = new ArrayList<>();
@@ -1164,15 +1102,12 @@ public class GameScreen {
         double targetX = px + (dirX * 1000);
         double targetY = py + (dirY * 1000);
         for (int i = 0; i < projectileCount; i++) {
-            // محاسبه زاویه برای تیرهای چندگانه
             double angleOffset = (i - (projectileCount - 1) / 2.0) * spreadAngle;
             double radianOffset = Math.toRadians(angleOffset);
 
-            // محاسبه جهت جدید با در نظر گرفتن انحراف
             double newDirX = dirX * Math.cos(radianOffset) - dirY * Math.sin(radianOffset);
             double newDirY = dirX * Math.sin(radianOffset) + dirY * Math.cos(radianOffset);
 
-            // نرمالایز کردن جهت
             double length = Math.sqrt(newDirX * newDirX + newDirY * newDirY);
             if (length > 0) {
                 newDirX /= length;
@@ -1197,49 +1132,9 @@ public class GameScreen {
             gamePane.getChildren().add(bullet.getShape());
         }
 
-//        BulletForMonster bullet = new BulletForMonster(px, py, targetX, targetY);
-//        bullet.setDamage(weapon.getTotalDamage());
-//
-//        switch(weapon.getName()) {
-//            case "Revolver":
-//                bullet.getShape().setFill(Color.CYAN);
-//                break;
-//            case "Shotgun":
-//                bullet.getShape().setFill(Color.RED);
-//                break;
-//            case "SMGs Dual":
-//                bullet.getShape().setFill(Color.PURPLE);
-//                break;
-//        }
-//
-//        activeBullets.add(bullet);
-//        gamePane.getChildren().add(bullet.getShape());
-
         System.out.println("Bullet added successfully. Total bullets: " + activeBullets.size());
     }
-//    private void shootInDirection(double dirX, double dirY) {
-//        GameMenu.playSFX();
-//        // موقعیت گلوله نسبت به دوربین
-//        double bulletX = player.getCenterX() - cameraOffsetX;
-//        double bulletY = player.getCenterY() - cameraOffsetY;
-//
-//        BulletForMonster bullet = new BulletForMonster(bulletX, bulletY, dirX, dirY);
-//        bullet.setDamage(weapon.getTotalDamage());
-//
-//        switch(weapon.getName()) {
-//            case "Revolver":
-//                bullet.getShape().setFill(Color.CYAN);
-//                break;
-//            case "Shotgun":
-//                bullet.getShape().setFill(Color.RED);
-//                break;
-//            case "SMGs Dual":
-//                bullet.getShape().setFill(Color.PURPLE);
-//                break;
-//        }
-//        activeBullets.add(bullet);
-//        worldPane.getChildren().add(bullet.getShape());
-//    }
+
     public void updateBulletsForMonster() {
         System.out.println("Updating bullets. Count: " + activeBullets.size());
 
@@ -1523,9 +1418,8 @@ public class GameScreen {
     public static void updateBarrierPosition(double cameraOffsetX, double cameraOffsetY) {
         if (!barrierActive) return;
 
-        // تنظیم موقعیت معکوس دیواره
         barrier.setX(WIDTH / 2 - barrier.getWidth() / 2 - cameraOffsetX);
-        barrier.setY(HEIGHT / 2 - barrier.getHeight() / 2 - cameraOffsetY); // حرکت معکوس در محور Y
+        barrier.setY(HEIGHT / 2 - barrier.getHeight() / 2 - cameraOffsetY);
     }
 
 

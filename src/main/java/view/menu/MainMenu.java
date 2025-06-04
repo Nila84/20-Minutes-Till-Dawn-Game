@@ -156,25 +156,8 @@ public class MainMenu extends Application {
                 return;
             }
 
-//            currentUser.setXP(savedData.getXp());
-//            System.out.println("****" + savedData.getHp());
-//            currentUser.getSelectedHero().setHp(savedData.getHp());
-//            System.out.println( currentUser.getSelectedHero().getHp());
-//            User.level = savedData.getLevel();
-//            currentUser.killNum = savedData.getKills();
-
             GameScreen.setStartTime(System.currentTimeMillis());
             GameScreen.setGameDuration((int) (savedData.getRemainingTime() / 1000L));
-
-//            List<Monster> restoredMonsters = new ArrayList<>();
-//            for (EnemyData enemyData : savedData.getEnemyDataList()) {
-//                Monster monster = GameViewController.createMonsterFromType
-//                        (enemyData.getType(), enemyData.getX(), enemyData.getY());
-//                if (monster != null) {
-//                    restoredMonsters.add(monster);
-//                }
-//            }
-//            GameScreen.setMonsters(restoredMonsters);
 
             if (currentUser.getSelectedHero().getName().equals("SHANA")) player = new Circle(15, Color.PURPLE);
             else if (currentUser.getSelectedHero().getName().equals("DIAMOND")) player = new Circle(15, Color.PINK);

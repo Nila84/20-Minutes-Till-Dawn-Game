@@ -1,0 +1,119 @@
+@font-face {
+    src: url('../fonts/MyFont.ttf');
+    font-family: 'MyCustomFont';
+}
+
+.custom-font {
+    -fx-font-family: 'MyCustomFont';
+    -fx-text-fill: #2c3e50;
+}
+
+.custom-font-title {
+    -fx-font-family: 'MyCustomFont';
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2b579a;
+}
+
+.custom-font-regular {
+    -fx-font-family: 'MyCustomFont';
+    -fx-font-size: 16px;
+}
+
+.custom-font-button {
+    -fx-font-family: 'MyCustomFont';
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+* {
+    -fx-focus-traversable: false;
+}
+.Background {
+    -fx-background-image: url("../images/wallpaper.jpg");
+    -fx-background-position: center center;
+    -fx-background-size: 700 700;
+    -fx-background-repeat: stretch;
+}
+
+.Background_Lose {
+    -fx-background-color: red;
+}
+
+.Background_Win {
+    -fx-background-color: green;
+}
+
+Label {
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+}
+
+Button {
+    -fx-min-width: 100;
+    -fx-max-width: 100;
+    -fx-font-size: 15;
+}
+
+Hyperlink {
+    -fx-font-size: 15;
+    -fx-text-fill: white;
+}
+
+Hyperlink:hover {
+    -fx-text-fill: black;
+}
+
+Hyperlink:selected {
+    -fx-text-fill: purple;
+}
+
+Button {
+    -fx-background-color: blue;
+    -fx-border-radius: 50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+Button:hover {
+    -fx-background-color: cyan;
+}
+
+TextField , PasswordField {
+    -fx-font-size: 15;
+}
+
+.bigButton {
+    -fx-min-width: 200;
+    -fx-max-width: 200;
+}
+
+.mainMenuButtons > Button {
+    -fx-min-width: 200;
+    -fx-max-width: 200;
+}
+
+.profileMenuButton > Button {
+    -fx-min-width: 200;
+    -fx-max-width: 200;
+}
+
+.ranksLabel {
+    -fx-min-width: 400;
+    -fx-max-width: 400;
+    -fx-text-fill: yellow;
+}
+.user-info-box {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-padding: 10;
+}
+
+.username-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.score-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}

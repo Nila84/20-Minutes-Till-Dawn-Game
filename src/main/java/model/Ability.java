@@ -119,7 +119,6 @@ public class Ability {
                 App.getCurrentUser().getSelectedHero().setHp(1);
                 break;
             case DAMAGER:
-//                //TODO فقط 10 ثانیه
                 originalDamage = App.getCurrentUser().getSelectedWeapon().getDamagePerProjectile();
                 int increasedDamage = (int) (originalDamage * (1 + value));
                 App.getCurrentUser().getSelectedWeapon().setDamagePerProjectile(increasedDamage);

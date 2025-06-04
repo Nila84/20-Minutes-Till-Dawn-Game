@@ -13,13 +13,13 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import model.*;
 import view.Paths;
+import view.enums.PreGameMenuText;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PreGameMenu extends Application {
-
     @FXML
     private VBox heroesBox;
     @FXML
@@ -28,21 +28,19 @@ public class PreGameMenu extends Application {
     private Slider timeSlider;
     @FXML
     private Label timeLabel;
+    @FXML
+    private Button startButton;
+    @FXML
+    private Button backButton;
 
     private ToggleGroup heroToggleGroup;
     private ToggleGroup weaponToggleGroup;
     private int theTime;
     private Hero hero;
+    private boolean isEnglish = GameController.language;
 
     public static Weapon weapon2;
     public static Ability ability2;
-    public void setTheTime(int theTime) {
-        this.theTime = theTime;
-    }
-
-    public int getTheTime() {
-        return theTime;
-    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -64,8 +62,19 @@ public class PreGameMenu extends Application {
 
     @FXML
     public void initialize() {
+        // Initialize buttons text
+        startButton.setText(getText(PreGameMenuText.START_GAME_EN));
+        backButton.setText(getText(PreGameMenuText.BACK_EN));
+
         // Initialize heroes selection
-        String[] heroes = {"SHANA", "DIAMOND", "SCARLET", "LILITH", "DASHER"};
+        String[] heroes = {
+                getText(PreGameMenuText.SHANA_EN),
+                getText(PreGameMenuText.DIAMOND_EN),
+                getText(PreGameMenuText.SCARLET_EN),
+                getText(PreGameMenuText.LILITH_EN),
+                getText(PreGameMenuText.DASHER_EN)
+        };
+
         heroToggleGroup = new ToggleGroup();
         for (String hero : heroes) {
             RadioButton radioButton = new RadioButton(hero);
@@ -76,7 +85,12 @@ public class PreGameMenu extends Application {
         ((RadioButton)heroToggleGroup.getToggles().get(0)).setSelected(true);
 
         // Initialize weapons selection
-        String[] weapons = {"Revolver", "Shotgun", "SMGs Dual"};
+        String[] weapons = {
+                getText(PreGameMenuText.REVOLVER_EN),
+                getText(PreGameMenuText.SHOTGUN_EN),
+                getText(PreGameMenuText.SMG_DUAL_EN)
+        };
+
         weaponToggleGroup = new ToggleGroup();
         for (String weapon : weapons) {
             RadioButton radioButton = new RadioButton(weapon);
@@ -96,12 +110,22 @@ public class PreGameMenu extends Application {
         timeSlider.setMinorTickCount(1);
         timeSlider.setSnapToTicks(true);
 
-        timeLabel.setText("Game Time: 5 minutes");
+        updateTimeLabel(5);
 
         timeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             int minutes = newVal.intValue();
-            timeLabel.setText("Game Time: " + minutes + " minutes");
+            updateTimeLabel(minutes);
         });
+    }
+    private void updateTimeLabel(int minutes) {
+        String timeText = getText(PreGameMenuText.TIME_LABEL_EN) +
+                minutes +
+                getText(PreGameMenuText.MINUTES_EN);
+        timeLabel.setText(timeText);
+    }
+
+    private String getText(PreGameMenuText textType) {
+        return PreGameMenuText.getText(textType, isEnglish);
     }
 
     @FXML
@@ -117,7 +141,6 @@ public class PreGameMenu extends Application {
             Hero hero = new Hero(selectedHero);
             Weapon weapon = new Weapon(selectedWeapon);
             weapon2 = weapon;
-            //TODO : رندوم بودن توانایی
             Ability ability = new Ability("VITALITY");
             ability2 = ability;
 
@@ -207,8 +230,6 @@ public class PreGameMenu extends Application {
                     player.setCenterY(savedData.getPlayerY());
                 }
             }
-            // 8. تنظیم زمان بازی
-//            gameScreen.setStartTime((System.currentTimeMillis() - elapsedTime)/1000);
 
             GameViewController.setupMovementControls(
                     gameScreen.getGamePane().getScene(),
@@ -223,23 +244,6 @@ public class PreGameMenu extends Application {
                 @Override
                 public void handle(long now) {
                     if (!GameController.isPaused) {
-//                        gameScreen.checkBussFight();
-//                        gameScreen.checkPlayerObstacleCollision();
-//                        gameScreen.checkImmunity();
-//                        gameScreen.weapon.updateReload();
-//                        gameScreen.ability.update();
-//                        gameScreen.updateGameTime();
-//                        gameScreen.updateMonsters();
-//                        gameScreen.updateBullets();
-//                        gameScreen.updateBulletsForMonster();
-//                        gameScreen.updateParticles();
-//                        gameScreen.checkBulletCollision();
-//                        gameScreen.checkBulletCollisionMonster();
-//                        gameScreen.checkExperienceOrbCollection();
-//                        gameScreen.checkTentacleMonsterSpawn();
-//                        gameScreen.checkEyebatMonsterSpawn();
-//                        gameScreen.checkMonsterSpeedIncrease();
-//                        gameScreen.monsters.forEach(Monster::updateKnockback);
                         for (Monster monster : GameScreen.getMonsters()) {
                             if (monster.isAlive()) {
                                 monster.move(
@@ -249,7 +253,6 @@ public class PreGameMenu extends Application {
                                 monster.updatePosition();
                             }
                         }
-//                        gameScreen.updateGameUI(savedData);
                     }
                 }
             };

@@ -196,7 +196,7 @@ public class User implements Comparable<User>{
     }
 
     public long getLongestSurvivalTime() {
-        return longestSurvivalTime / 1000; // تبدیل به ثانیه
+        return longestSurvivalTime / 1000;
     }
 
 
@@ -234,40 +234,26 @@ public class User implements Comparable<User>{
     }
 
     public int getScore() {
-//        return this.scoreOfDiff.stream().mapToInt(Integer::intValue).sum();
         return scores;
     }
 
     public void updateUserStats(int killNum, int score, long survivalTime) {
-        // Update kill count
         this.killNumber += killNum;
 
-        // Update score
         this.score += score;
 
-        // Update longest survival time if current survival time is longer
         if (survivalTime > this.longestSurvivalTime) {
             this.longestSurvivalTime = survivalTime;
         }
 
-
-        // Update last game timestamp for the current difficulty
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.lastGames[nowDiff] = LocalDateTime.now().format(formatter);
 
-        // Update score for the current difficulty
         this.scoreOfDiff.set(nowDiff, this.scoreOfDiff.get(nowDiff) + score);
 
-        // Save changes to JSON file
         DBController.saveUsers();
         if (App.getCurrentUser() != null && this.username.equals(App.getCurrentUser().getUsername())) {
             DBController.saveCurrentUser();
         }
     }
-
-
-    public void setLastGames(String[] lastGames) {
-        this.lastGames = lastGames;
-    }
-
 }

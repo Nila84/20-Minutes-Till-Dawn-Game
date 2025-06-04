@@ -3,7 +3,6 @@ package controller;
 import model.User;
 import view.menu.GameMenu;
 
-//
 import java.util.ArrayList;
 
 public class App {

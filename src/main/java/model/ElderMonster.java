@@ -48,20 +48,4 @@ public class ElderMonster extends Monster {
         return 20;
     }
 
-
-    public void updateShield(double gameProgress) {
-        this.shieldSize = 1.0 - gameProgress;
-    }
-
-    public boolean isShieldActive() {
-        return shieldActive;
-    }
-
-    public double getShieldSize() {
-        return shieldSize;
-    }
-
-    public void deactivateShield() {
-        this.shieldActive = false;
-    }
 }

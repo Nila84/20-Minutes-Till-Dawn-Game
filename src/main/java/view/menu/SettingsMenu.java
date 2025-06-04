@@ -1,74 +1,141 @@
 package view.menu;
 
+import controller.GameController;
 import controller.GameViewController;
 import javafx.application.Application;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import view.Paths;
-
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import view.enums.SettingsMenuText;
 
 public class SettingsMenu extends Application {
-    @FXML
-    private TextField downKeyField;
-    @FXML
-    private TextField leftKeyField;
-    @FXML
-    private TextField rightKeyField;
-    @FXML
     private TextField upKeyField;
-    @FXML
+    private TextField downKeyField;
+    private TextField leftKeyField;
+    private TextField rightKeyField;
+    private Button saveKeysButton;
+    private Button changeThemeButton;
+    private Button toggleSFXButton;
+    private Button nextSongButton;
+    private Button autoReloadButton;
+    private Button changeLanguageButton;
+    private Button backButton;
+
     public static BorderPane settingsPane;
+    private boolean isEnglish = GameController.language;
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL settingsMenuFXMLUrl = SettingsMenu.class.getResource(Paths.SETTINGS_MENU_FXML_FILE.getPath());
-        FXMLLoader loader = new FXMLLoader(settingsMenuFXMLUrl);
-        BorderPane borderPane = loader.load();
-        settingsPane = borderPane;
+        createUIComponents();
+
+        settingsPane = new BorderPane();
+        settingsPane.setCenter(createSettingsCenter());
         settingsPane.getChildren().add(GameViewController.createMuteUnmuteIcon());
-        if (GameViewController.isBlackWhiteThemeOn) {
-            borderPane.getStylesheets().remove(getClass()
-                    .getResource(Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
-            borderPane.getStylesheets().add(getClass()
-                    .getResource(Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
-        }
-        Scene settingsMenuScene = new Scene(borderPane);
+        settingsPane.getStyleClass().add("Background");
+
+        applyTheme();
+
+        Scene settingsMenuScene = new Scene(settingsPane, 700, 700);
         stage.setScene(settingsMenuScene);
+        stage.setTitle(getText(SettingsMenuText.SETTINGS_TITLE_EN));
         stage.show();
     }
 
-    @FXML
-    public void toggleSFX(MouseEvent event) {
-        GameViewController.isSFXOn = !GameViewController.isSFXOn;
+    private void createUIComponents() {
+        upKeyField = new TextField(GameViewController.getKeyBinding("UP").toString());
+        downKeyField = new TextField(GameViewController.getKeyBinding("DOWN").toString());
+        leftKeyField = new TextField(GameViewController.getKeyBinding("LEFT").toString());
+        rightKeyField = new TextField(GameViewController.getKeyBinding("RIGHT").toString());
+
+        saveKeysButton = new Button(getText(SettingsMenuText.SAVE_KEYS_EN));
+        saveKeysButton.setOnAction(e -> saveKeys(null));
+
+        changeThemeButton = new Button(getText(SettingsMenuText.CHANGE_THEME_EN));
+        changeThemeButton.setOnAction(e -> changeTheme());
+
+        toggleSFXButton = new Button(getText(SettingsMenuText.TOGGLE_SFX_EN));
+        toggleSFXButton.setOnAction(e -> toggleSFX(null));
+
+        nextSongButton = new Button(getText(SettingsMenuText.NEXT_SONG_EN));
+        nextSongButton.setOnAction(e -> nextSong(null));
+
+        autoReloadButton = new Button(getText(SettingsMenuText.AUTO_RELOAD_EN));
+        autoReloadButton.setOnAction(e -> autoReload(null));
+
+        changeLanguageButton = new Button(getText(SettingsMenuText.CHANGE_LANGUAGE_EN));
+        changeLanguageButton.setOnAction(e -> changeLanguage(null));
+
+        backButton = new Button(getText(SettingsMenuText.BACK_EN));
+        backButton.setOnAction(e -> back());
     }
 
+    private VBox createSettingsCenter() {
+        VBox centerBox = new VBox(20);
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setPadding(new Insets(20));
+
+        GridPane keyBindingsGrid = new GridPane();
+        keyBindingsGrid.setHgap(10);
+        keyBindingsGrid.setVgap(10);
+        keyBindingsGrid.setAlignment(Pos.CENTER);
+
+        keyBindingsGrid.add(new Label(getText(SettingsMenuText.UP_KEY_EN)), 0, 0);
+        keyBindingsGrid.add(upKeyField, 1, 0);
+        keyBindingsGrid.add(new Label(getText(SettingsMenuText.DOWN_KEY_EN)), 0, 1);
+        keyBindingsGrid.add(downKeyField, 1, 1);
+        keyBindingsGrid.add(new Label(getText(SettingsMenuText.LEFT_KEY_EN)), 0, 2);
+        keyBindingsGrid.add(leftKeyField, 1, 2);
+        keyBindingsGrid.add(new Label(getText(SettingsMenuText.RIGHT_KEY_EN)), 0, 3);
+        keyBindingsGrid.add(rightKeyField, 1, 3);
+
+        VBox buttonsBox = new VBox(15);
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.getChildren().addAll(
+                saveKeysButton,
+                changeThemeButton,
+                toggleSFXButton,
+                nextSongButton,
+                autoReloadButton,
+                changeLanguageButton,
+                backButton
+        );
+
+        centerBox.getChildren().addAll(keyBindingsGrid, buttonsBox);
+        return centerBox;
+    }
+
+    private void applyTheme() {
+        if (GameViewController.isBlackWhiteThemeOn) {
+            settingsPane.getStylesheets().remove(getClass().getResource(
+                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
+            settingsPane.getStylesheets().add(getClass().getResource(
+                    Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
+        } else {
+            settingsPane.getStylesheets().add(getClass().getResource(
+                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
+        }
+    }
+
+    private String getText(SettingsMenuText textType) {
+        return SettingsMenuText.getText(textType, isEnglish);
+    }
+
+    public void toggleSFX(MouseEvent event) {
+        GameViewController.isSFXOn = !GameViewController.isSFXOn;
+        refreshUI();
+    }
 
     public void changeTheme() {
         GameViewController.isBlackWhiteThemeOn = !GameViewController.isBlackWhiteThemeOn;
-        if (GameViewController.isBlackWhiteThemeOn) {
-            settingsPane.getStylesheets().remove(getClass().getResource
-                    (Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
-            settingsPane.getStylesheets().add(getClass().getResource
-                    (Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
-        } else {
-            settingsPane.getStylesheets().add(getClass().getResource
-                    (Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
-            settingsPane.getStylesheets().remove(getClass().getResource
-                    (Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
-        }
+        applyTheme();
+        refreshUI();
     }
 
     public void back() {
@@ -79,12 +146,10 @@ public class SettingsMenu extends Application {
         }
     }
 
-    @FXML
     public void nextSong(MouseEvent mouseEvent) {
         GameViewController.changeToNextMusic();
     }
 
-    @FXML
     public void saveKeys(MouseEvent mouseEvent) {
         try {
             String leftKey = leftKeyField.getText().toUpperCase();
@@ -93,40 +158,55 @@ public class SettingsMenu extends Application {
             String upKey = upKeyField.getText().toUpperCase();
 
             if (leftKey.isEmpty() || rightKey.isEmpty() || upKey.isEmpty() || downKey.isEmpty()) {
-                GameViewController.alertShowing(Alert.AlertType.ERROR, "Change keys failed!",
-                        "Change keys failed!", "Keys cannot be empty!");
+                showAlert(
+                        getText(SettingsMenuText.EMPTY_KEYS_EN),
+                        getText(SettingsMenuText.EMPTY_KEYS_MSG_EN),
+                        Alert.AlertType.ERROR
+                );
                 return;
             }
 
-            // Validate each key
             try {
                 KeyCode.valueOf(upKey);
                 KeyCode.valueOf(downKey);
                 KeyCode.valueOf(leftKey);
                 KeyCode.valueOf(rightKey);
             } catch (IllegalArgumentException e) {
-                GameViewController.alertShowing(Alert.AlertType.ERROR, "Invalid Key",
-                        "Invalid Key Entered", "One or more keys are not valid. Please use standard key codes.");
+                showAlert(
+                        getText(SettingsMenuText.INVALID_KEY_EN),
+                        getText(SettingsMenuText.INVALID_KEY_MSG_EN),
+                        Alert.AlertType.ERROR
+                );
                 return;
             }
 
-            // If validation passes, set the key bindings
             GameViewController.setKeyBinding("UP", KeyCode.valueOf(upKey));
             GameViewController.setKeyBinding("DOWN", KeyCode.valueOf(downKey));
             GameViewController.setKeyBinding("LEFT", KeyCode.valueOf(leftKey));
             GameViewController.setKeyBinding("RIGHT", KeyCode.valueOf(rightKey));
 
-            GameViewController.alertShowing(Alert.AlertType.INFORMATION, "Success",
-                    "Keys Saved", "Key bindings have been updated successfully.");
+            showAlert(
+                    getText(SettingsMenuText.KEYS_SAVED_EN),
+                    getText(SettingsMenuText.KEYS_SAVED_MSG_EN),
+                    Alert.AlertType.INFORMATION
+            );
 
         } catch (Exception e) {
-            GameViewController.alertShowing(Alert.AlertType.ERROR, "Error",
-                    "Failed to save keys", "An unexpected error occurred: " + e.getMessage());
+            showAlert("Error", "Failed to save keys: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void autoReload(MouseEvent mouseEvent) {
         GameViewController.autoReload = !GameViewController.autoReload;
+        refreshUI();
     }
 
     private void refreshUI() {
@@ -135,5 +215,10 @@ public class SettingsMenu extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void changeLanguage(MouseEvent mouseEvent) {
+        GameController.language = !GameController.language;
+        refreshUI();
     }
 }

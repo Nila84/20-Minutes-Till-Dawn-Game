@@ -92,50 +92,6 @@ public class GameViewController {
         keyBindings.put(action, keyCode);
     }
 
-//    public static void setupMovementControls(Scene scene, Circle player, double speed) {
-//        final boolean[] upPressed = {false};
-//        final boolean[] downPressed = {false};
-//        final boolean[] leftPressed = {false};
-//        final boolean[] rightPressed = {false};
-//        final boolean[] isMoving = {false};
-//
-//        scene.setOnKeyPressed(event -> {
-//            KeyCode keyCode = event.getCode();
-//            boolean wasMoving = isMoving[0];
-//
-//            if (keyCode == getKeyBinding("UP")) upPressed[0] = true;
-//            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = true;
-//            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = true;
-//            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = true;
-//
-//            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
-//
-//            if (isMoving[0] && !wasMoving) {
-//                GameScreen.getInstance().startPulseAnimation();
-//            }
-//
-//            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
-//        });
-//
-//        scene.setOnKeyReleased(event -> {
-//            KeyCode keyCode = event.getCode();
-//            boolean wasMoving = isMoving[0];
-//
-//            if (keyCode == getKeyBinding("UP")) upPressed[0] = false;
-//            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = false;
-//            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = false;
-//            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = false;
-//
-//            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
-//
-//            if (!isMoving[0] && wasMoving) {
-//                GameScreen.getInstance().stopPulseAnimation();
-//            }
-//
-//            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
-//        });
-//    }
-
     public static void setupMovementControls(Scene scene, Circle player, double speed) {
         final boolean[] isMoving = {false};
         final boolean[] upPressed = {false};
@@ -158,6 +114,18 @@ public class GameViewController {
             } else if (keyCode == getKeyBinding("RIGHT")) {
                 rightPressed[0] = true;
                 moveWorld(-speed, 0);
+            }
+            if (keyCode == getKeyBinding("RIGHT") && keyCode == getKeyBinding("UP")) {
+                moveWorld(-speed, speed);
+            }
+            if (keyCode == getKeyBinding("LEFT") && keyCode == getKeyBinding("UP")) {
+                moveWorld(speed, speed);
+            }
+            if (keyCode == getKeyBinding("LEFT") && keyCode == getKeyBinding("DOWN")) {
+                moveWorld(speed, -speed);
+            }
+            if (keyCode == getKeyBinding("RIGHT") && keyCode == getKeyBinding("DOWN")) {
+                moveWorld(-speed, -speed);
             }
             isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
             if (isMoving[0] && !wasMoving) {
@@ -209,10 +177,6 @@ public class GameViewController {
             obstacle.setY(obstacle.getY() + dy);
         }
 
-//        if (GameScreen.barrierActive) {
-//            GameScreen.barrier.setX(-GameScreen.barrier.getX() - dx);
-//            GameScreen.barrier.setY(-GameScreen.barrier.getY() - dy);
-//        }
         GameScreen.updateBarrierPosition(GameScreen.cameraOffsetX, GameScreen.cameraOffsetY);
 
         for (Bullet bullet : GameScreen.bullets) {
@@ -245,29 +209,6 @@ public class GameViewController {
             e.printStackTrace();
             return null;
         }
-    }
-
-
-    private static void updatePlayerPosition(Circle player, double speed,
-                                             boolean up, boolean down,
-                                             boolean left, boolean right) {
-        double dx = 0;
-        double dy = 0;
-
-        if (up && !down) dy = -speed;
-        else if (down && !up) dy = speed;
-
-        if (left && !right) dx = -speed;
-        else if (right && !left) dx = speed;
-
-        if (dx != 0 && dy != 0) {
-            double length = Math.sqrt(dx * dx + dy * dy);
-            dx = dx / length * speed;
-            dy = dy / length * speed;
-        }
-
-        player.setCenterX(player.getCenterX() + dx);
-        player.setCenterY(player.getCenterY() + dy);
     }
 
 
@@ -529,7 +470,6 @@ public class GameViewController {
         scoreText.setFill(Color.YELLOW);
         scoreText.setLayoutX(100);
         scoreText.setLayoutY(450);
-        //TODO : نمایش برد ها و باخت ها و خواندن از فایل برای آن کاربر
         javafx.scene.control.Button backButton = new javafx.scene.control.Button("Back to Main Menu");
         backButton.setLayoutX(100);
         backButton.setLayoutY(470);
@@ -569,9 +509,11 @@ public class GameViewController {
             System.out.println(cheatName + " activated!");
         });
         box.setOnMouseEntered
-                (e -> box.setStyle("-fx-background-color: #d0e7ff; -fx-border-color: #2980b9; -fx-border-radius: 5; -fx-background-radius: 5;"));
+                (e -> box.setStyle
+                        ("-fx-background-color: #d0e7ff; -fx-border-color: #2980b9; -fx-border-radius: 5; -fx-background-radius: 5;"));
         box.setOnMouseExited
-                (e -> box.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-background-radius: 5;"));
+                (e -> box.setStyle
+                        ("-fx-background-color: #f0f0f0; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-background-radius: 5;"));
 
         return box;
     }
@@ -592,18 +534,21 @@ public class GameViewController {
         VBox cheatList = new VBox(10);
         cheatList.setAlignment(Pos.CENTER_LEFT);
 
-        HBox cheat1 = createCheatBox("Reduce Game Time", "Shortens remaining game time by 50%", "F1", () -> {
+        HBox cheat1 = createCheatBox
+                ("Reduce Game Time", "Shortens remaining game time by 50%", "F1", () -> {
             GameScreen.getInstance().setGameDuration(-50);
             System.out.println("Game time reduced by 1 minute");
         });
 
-        HBox cheat2 = createCheatBox("Level Up Character", "Instantly levels up with full animations", "F2", () -> {
+        HBox cheat2 = createCheatBox
+                ("Level Up Character", "Instantly levels up with full animations", "F2", () -> {
             GameScreen.showAbilitySelectionMenu();
             App.getCurrentUser().setLevel(1);
             System.out.println("Hero leveled up!");
         });
 
-        HBox cheat3 = createCheatBox("Restore Health", "Fully restores health when empty", "F3", () -> {
+        HBox cheat3 = createCheatBox
+                ("Restore Health", "Fully restores health when empty", "F3", () -> {
             Hero hero = App.getCurrentUser().getSelectedHero();
             if (hero.getHp() == 1) {
                 hero.setHp(10);
@@ -613,14 +558,16 @@ public class GameViewController {
             }
         });
 
-        HBox cheat4 = createCheatBox("Trigger Boss Fight", "Skips to boss fight immediately", "F4", () -> {
+        HBox cheat4 = createCheatBox
+                ("Trigger Boss Fight", "Skips to boss fight immediately", "F4", () -> {
             for (int i = 0; i < 15; i++) {
                 GameScreen.spawnMonstersCheat(1);
             }
             System.out.println("15 Elder enemies added!");
         });
 
-        HBox cheat5 = createCheatBox("Kill Monsters", "Kill all Monsters", "F5", () -> {
+        HBox cheat5 = createCheatBox
+                ("Kill Monsters", "Kill all Monsters", "F5", () -> {
             killAllMonsters();
             System.out.println("Infinite ammo enabled for 60 seconds");
         });

@@ -79,9 +79,11 @@ public class ScoreboardMenu extends Application {
             Label label = labels.get(i + 1);
             String survivalTime = user.getFormattedSurvivalTime();
 
+            String rankSymbol = (i < 3) ? " +" : "";
             if (user.equals(App.getCurrentUser())) {
-                String text = String.format("*"+"%d. %s | Score: %d | Kills: %d | Survival: %s",
+                String text = String.format("*"+"%d. %s%s | Score: %d | Kills: %d | Survival: %s",
                         i + 1,
+                        rankSymbol,
                         user.getUsername(),
                         user.getScore(),
                         user.killNum,
@@ -90,8 +92,9 @@ public class ScoreboardMenu extends Application {
 
             }
             else {
-                String text = String.format("%d. %s | Score: %d | Kills: %d | Survival: %s",
+                String text = String.format("%d. %s%s | Score: %d | Kills: %d | Survival: %s",
                         i + 1,
+                        rankSymbol,
                         user.getUsername(),
                         user.getScore(),
                         user.killNum,

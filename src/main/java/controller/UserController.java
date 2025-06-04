@@ -88,7 +88,8 @@ public class UserController {
         Random random = new Random();
         int randomAvatarNumber = ((Math.abs(random.nextInt())) % 8) + 1;
         if (UserController.getTemporaryUsername() != null) {
-            Matcher numberMatcher = Pattern.compile("(?<number>[\\d])\\.png").matcher(UserController.getTemporaryUsername());
+            Matcher numberMatcher = Pattern.compile("(?<number>[\\d])\\.png")
+                    .matcher(UserController.getTemporaryUsername());
             if (numberMatcher.find()) {
                 int number = Integer.parseInt(numberMatcher.group("number"));
                 while (number == randomAvatarNumber) {

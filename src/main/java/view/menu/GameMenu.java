@@ -90,7 +90,4 @@ public class GameMenu extends Application {
     public void initialize() {
 
     }
-
-
-
 }
