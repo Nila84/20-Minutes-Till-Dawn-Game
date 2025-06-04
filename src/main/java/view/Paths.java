@@ -16,6 +16,7 @@ public enum Paths {
     AVATARS_PATH("src/main/resources/images/Avatars/"),
     SELECT_AVATAR_MENU_FXML_FILE("/FXML/selectAvatarMenu.fxml"),
     WALLPAPER_IMAGE_PATH("images/wallpaper.jpg"),
+    CURSOR_IMAGE_PATH("images/Cursor.jpg"),
     MUSICS_PATH("src/main/resources/musics/"),
     COMMON_STYLES_FILE_PATH("/CSS/commonStyles.css"),
     BLACK_WHITE_STYLE_FILE_PATH("/CSS/BlackWhiteStyle.css"),

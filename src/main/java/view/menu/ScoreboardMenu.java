@@ -1,115 +1,158 @@
 package view.menu;
 
-
 import controller.App;
 import controller.GameController;
 import controller.GameViewController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.User;
 import view.Paths;
+import view.enums.ScoreboardMenuText;
+import view.util.CustomCursor;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScoreboardMenu extends Application {
-    public Label rank1;
-    public Label rank2;
-    public Label rank3;
-    public Label rank4;
-    public Label rank5;
-    public Label rank6;
-    public Label rank7;
-    public Label rank8;
-    public Label rank9;
-    public Label rank10;
-    public Label stateOfWin;
+    private static final int MAX_RANKS = 10;
+    private List<Label> rankLabels = new ArrayList<>();
+    private Button timeButton;
+    private Button killsButton;
+    private Button scoreButton;
+    private Button usernameButton;
+    private Button backButton;
+    private Label titleLabel;
+
     private User loggedInUser;
     private String currentSort = "score";
+    private boolean isEnglish = GameController.language; // Default to English
 
     @Override
     public void start(Stage stage) throws Exception {
         this.loggedInUser = App.getCurrentUser();
-        URL scoreboardMenuFXMLUrl = ScoreboardMenu.class.getResource(Paths.SCOREBOARD_MENU_FXML_FILE.getPath());
-        BorderPane borderPane = FXMLLoader.load(scoreboardMenuFXMLUrl);
-        if (GameViewController.isBlackWhiteThemeOn) {
-            borderPane.getStylesheets().remove(getClass().getResource(
-                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
-            borderPane.getStylesheets().add(getClass().getResource(
-                    Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
-        }
-        Scene scoreboardMenuScene = new Scene(borderPane);
+        BorderPane borderPane = createScoreboardPane();
+        borderPane.getStyleClass().add("Background");
+        applyTheme(borderPane);
+
+        Scene scoreboardMenuScene = new Scene(borderPane,700 ,700);
+        CustomCursor.setGameCursor(scoreboardMenuScene);
+        stage.setTitle(getText(ScoreboardMenuText.SCOREBOARD_TITLE));
         stage.setScene(scoreboardMenuScene);
         stage.show();
+
+        showRanking(currentSort);
     }
 
-    public void initialize() {
-        showRanking("score");
+    private BorderPane createScoreboardPane() {
+        BorderPane borderPane = new BorderPane();
+
+        // Initialize ranking labels
+        for (int i = 0; i < MAX_RANKS; i++) {
+            Label label = new Label();
+            rankLabels.add(label);
+        }
+
+        // Create sorting buttons
+        timeButton = createSortButton("time", ScoreboardMenuText.TIME_BUTTON);
+        killsButton = createSortButton("kills", ScoreboardMenuText.KILLS_BUTTON);
+        scoreButton = createSortButton("score", ScoreboardMenuText.SCORE_BUTTON);
+        usernameButton = createSortButton("username", ScoreboardMenuText.USERNAME_BUTTON);
+
+        // Create back button
+        backButton = new Button(getText(ScoreboardMenuText.BACK_BUTTON));
+        backButton.setOnAction(e -> back(null));
+
+        // Create title
+        titleLabel = new Label(getText(ScoreboardMenuText.SCOREBOARD_TITLE));
+        titleLabel.setStyle("-fx-text-fill: red; -fx-font-size: 20px;");
+
+        // Create button panel
+        HBox buttonPanel = new HBox(10);
+        buttonPanel.setAlignment(Pos.CENTER);
+        buttonPanel.getChildren().addAll(timeButton, killsButton, scoreButton, usernameButton);
+
+        // Create main content
+        VBox centerBox = new VBox(15);
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.getChildren().add(buttonPanel);
+        centerBox.getChildren().add(titleLabel);
+        centerBox.getChildren().addAll(rankLabels);
+        centerBox.getChildren().add(backButton);
+
+        borderPane.setCenter(centerBox);
+        return borderPane;
+    }
+
+    private Button createSortButton(String sortType, ScoreboardMenuText text) {
+        Button button = new Button(getText(text));
+        button.setOnAction(e -> showRanking(sortType));
+        return button;
+    }
+
+    private void applyTheme(BorderPane pane) {
+        if (GameViewController.isBlackWhiteThemeOn) {
+            pane.getStylesheets().remove(getClass().getResource(
+                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
+            pane.getStylesheets().add(getClass().getResource(
+                    Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
+        } else {
+            pane.getStylesheets().add(getClass().getResource(
+                    Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
+        }
     }
 
     private void showRanking(String sortType) {
         this.currentSort = sortType;
-        HashMap<Integer, Label> labels = new HashMap<>();
-        pushingLabelsToHashMap(labels);
+        ArrayList<User> rankedUsers = getRankedUsers(sortType);
 
-        ArrayList<User> rankedUsers;
-        switch (sortType) {
-            case "time":
-                rankedUsers = GameController.rankingBySurvivalTime();
-                break;
-            case "kills":
-                rankedUsers = GameController.rankingByKills();
-                break;
-            case "username":
-                rankedUsers = GameController.rankingByUsername();
-                break;
-            case "score":
-            default:
-                rankedUsers = GameController.rankingByScore();
-        }
-
-        for (int i = 0; i < rankedUsers.size() && i < 10; i++) {
+        for (int i = 0; i < rankedUsers.size() && i < MAX_RANKS; i++) {
             User user = rankedUsers.get(i);
-            Label label = labels.get(i + 1);
-            String survivalTime = user.getFormattedSurvivalTime();
-
-            String rankSymbol = (i < 3) ? " +" : "";
-            if (user.equals(App.getCurrentUser())) {
-                String text = String.format("*"+"%d. %s%s | Score: %d | Kills: %d | Survival: %s",
-                        i + 1,
-                        rankSymbol,
-                        user.getUsername(),
-                        user.getScore(),
-                        user.killNum,
-                        survivalTime);
-                label.setText(text);
-
-            }
-            else {
-                String text = String.format("%d. %s%s | Score: %d | Kills: %d | Survival: %s",
-                        i + 1,
-                        rankSymbol,
-                        user.getUsername(),
-                        user.getScore(),
-                        user.killNum,
-                        survivalTime);
-                label.setText(text);
-            }
-
-
-            if (user.equals(loggedInUser)) {
-                label.setStyle("-fx-font-weight: bold; -fx-text-fill: " +
-                        (i < 3 ? getRankColor(i + 1) : "black"));
-            } else {
-                label.setStyle("-fx-text-fill: " + getRankColor(i + 1));
-            }
+            Label label = rankLabels.get(i);
+            updateRankLabel(label, user, i + 1);
         }
+    }
+
+    private ArrayList<User> getRankedUsers(String sortType) {
+        switch (sortType) {
+            case "time": return GameController.rankingBySurvivalTime();
+            case "kills": return GameController.rankingByKills();
+            case "username": return GameController.rankingByUsername();
+            case "score":
+            default: return GameController.rankingByScore();
+        }
+    }
+
+    private void updateRankLabel(Label label, User user, int rank) {
+        String rankSymbol = (rank <= 3) ? " +" : "";
+        String prefix = user.equals(loggedInUser) ? "*" : "";
+        String survivalTime = user.getFormattedSurvivalTime();
+
+        String text = String.format("%s%d. %s%s | %s: %d | %s: %d | %s: %s",
+                prefix,
+                rank,
+                rankSymbol,
+                user.getUsername(),
+                getText(ScoreboardMenuText.SCORE_LABEL),
+                user.getScore(),
+                getText(ScoreboardMenuText.KILLS_LABEL),
+                user.killNum,
+                getText(ScoreboardMenuText.TIME_LABEL),
+                survivalTime);
+
+        label.setText(text);
+        label.setStyle("-fx-font-weight: " + (user.equals(loggedInUser) ? "bold" : "normal") +
+                "; -fx-text-fill: " + getRankColor(rank));
     }
 
     private String getRankColor(int rank) {
@@ -121,41 +164,27 @@ public class ScoreboardMenu extends Application {
         }
     }
 
-    private void pushingLabelsToHashMap(HashMap<Integer , Label> labels) {
-        labels.put(1 , rank1);
-        labels.put(2 , rank2);
-        labels.put(3 , rank3);
-        labels.put(4 , rank4);
-        labels.put(5 , rank5);
-        labels.put(6 , rank6);
-        labels.put(7 , rank7);
-        labels.put(8 , rank8);
-        labels.put(9 , rank9);
-        labels.put(10 , rank10);
-    }
-
-
     public void back(MouseEvent mouseEvent) {
         try {
             new MainMenu().start(LoginMenu.stageOfProgram);
         } catch (Exception e) {
-            System.out.println("an error occurred");
+            showAlert(
+                    getText(ScoreboardMenuText.ERROR_TITLE),
+                    getText(ScoreboardMenuText.BACK_ERROR_MSG),
+                    Alert.AlertType.ERROR
+            );
         }
     }
 
-    public void livingTime(MouseEvent mouseEvent) {
-        showRanking("time");
+    private String getText(ScoreboardMenuText textType) {
+        return textType.getText(isEnglish);
     }
 
-    public void killsNumber(MouseEvent mouseEvent) {
-        showRanking("kills");
-    }
-
-    public void scoreRanking(MouseEvent mouseEvent) {
-        showRanking("score");
-    }
-
-    public void usernameRanking(MouseEvent mouseEvent) {
-        showRanking("username");
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

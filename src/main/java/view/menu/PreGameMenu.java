@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import model.*;
 import view.Paths;
 import view.enums.PreGameMenuText;
+import view.util.CustomCursor;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class PreGameMenu extends Application {
         }
 
         Scene preGameMenuScene = new Scene(borderPane);
+        CustomCursor.setGameCursor(preGameMenuScene);
         stage.setScene(preGameMenuScene);
         stage.show();
     }

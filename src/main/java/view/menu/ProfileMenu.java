@@ -15,6 +15,7 @@ import view.Paths;
 import view.enums.ErrorMessages;
 import view.enums.ProfileMenuText;
 import view.enums.SuccessMessages;
+import view.util.CustomCursor;
 
 public class ProfileMenu extends Application {
     private TextField usernameField;
@@ -41,6 +42,7 @@ public class ProfileMenu extends Application {
         }
 
         Scene profileMenuScene = new Scene(borderPane, 700, 700);
+        CustomCursor.setGameCursor(profileMenuScene);
         stage.setScene(profileMenuScene);
         stage.show();
     }

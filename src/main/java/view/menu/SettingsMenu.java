@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import view.Paths;
 import view.enums.SettingsMenuText;
+import view.util.CustomCursor;
 
 public class SettingsMenu extends Application {
     private TextField upKeyField;
@@ -43,6 +44,7 @@ public class SettingsMenu extends Application {
         applyTheme();
 
         Scene settingsMenuScene = new Scene(settingsPane, 700, 700);
+        CustomCursor.setGameCursor(settingsMenuScene);
         stage.setScene(settingsMenuScene);
         stage.setTitle(getText(SettingsMenuText.SETTINGS_TITLE_EN));
         stage.show();

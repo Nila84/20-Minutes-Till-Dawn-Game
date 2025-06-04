@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import view.Paths;
+import view.util.CustomCursor;
 
 import java.io.File;
 import java.net.URL;
@@ -62,6 +63,7 @@ public class SelectAvatarMenu extends Application {
             borderPane.getChildren().add(imageView);
         }
         Scene selectAvatarMenuScene = new Scene(borderPane);
+        CustomCursor.setGameCursor(selectAvatarMenuScene);
         stage.setScene(selectAvatarMenuScene);
         stage.show();
     }

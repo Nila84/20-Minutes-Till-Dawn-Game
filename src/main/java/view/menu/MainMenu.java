@@ -12,10 +12,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.*;
 import view.Paths;
 import view.enums.MainMenuText;
+import view.util.CustomCursor;
 
 public class MainMenu extends Application {
     private ImageView avatarImageView;
@@ -44,6 +46,7 @@ public class MainMenu extends Application {
                     Paths.COMMON_STYLES_FILE_PATH.getPath()).toExternalForm());
         }
         Scene mainMenuScene = new Scene(borderPane, 700, 700);
+        CustomCursor.setGameCursor(mainMenuScene);
         stage.setScene(mainMenuScene);
         stage.show();
     }
@@ -65,6 +68,17 @@ public class MainMenu extends Application {
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
         topBar.getStyleClass().add("user-info-box");
+        Font customFont = Font.loadFont(getClass().getResourceAsStream(
+                "/fonts/MyFont.ttf"), 10);
+
+        if (customFont != null) {
+            usernameLabel.setFont(customFont);
+            scoreLabel.setFont(Font.font(customFont.getFamily(), 10));
+        } else {
+            System.out.println("bjhhjb");
+            usernameLabel.setFont(Font.font("Arial", 18));
+            scoreLabel.setFont(Font.font("Arial", 16));
+        }
 
         User currentUser = App.getCurrentUser();
         if (currentUser != null) {
@@ -91,6 +105,17 @@ public class MainMenu extends Application {
         VBox centerMenu = new VBox(40);
         centerMenu.setAlignment(Pos.CENTER);
         centerMenu.getStyleClass().add("mainMenuButtons");
+        Font buttonFont = Font.loadFont(getClass().getResourceAsStream(
+                "/fonts/MyFont.ttf"), 10);
+
+        if (buttonFont != null) {
+            System.out.println("innn");
+            centerMenu.getChildren().forEach(node -> {
+                if (node instanceof Button) {
+                    ((Button) node).setFont(buttonFont);
+                }
+            });
+        }
 
         Button talentButton = createMenuButton(getText(MainMenuText.TALENT_MENU_EN), this::talentMenu);
         Button preGameButton = createMenuButton(getText(MainMenuText.PRE_GAME_EN), this::preGameMenu);

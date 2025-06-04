@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import view.Paths;
 import view.enums.RegisterMenuText;
+import view.util.CustomCursor;
 
 public class RegisterMenu extends Application {
     // UI Components
@@ -32,6 +33,7 @@ public class RegisterMenu extends Application {
         applyTheme(borderPane);
 
         Scene registerMenuScene = new Scene(borderPane,700,700);
+        CustomCursor.setGameCursor(registerMenuScene);
         stage.setTitle(getText(RegisterMenuText.REGISTER_TITLE));
         stage.setScene(registerMenuScene);
         stage.show();

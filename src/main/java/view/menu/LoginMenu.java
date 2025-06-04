@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import view.Paths;
 import view.enums.LoginMenuText;
+import view.util.CustomCursor;
 
 import java.net.URL;
 
@@ -37,6 +38,7 @@ public class LoginMenu extends Application {
     private boolean isEnglish = GameController.language; // Default to English, can be changed
 
     public static void main(String[] args) {
+        CustomCursor.initialize();
         App.run();
         launch(args);
     }
@@ -55,6 +57,7 @@ public class LoginMenu extends Application {
             applyTheme(borderPane);
 
             Scene loginMenuScene = new Scene(borderPane, 700, 700);
+            CustomCursor.setGameCursor(loginMenuScene);
             stage.setTitle(getText(LoginMenuText.LOGIN_TITLE));
             stage.setScene(loginMenuScene);
             stage.show();

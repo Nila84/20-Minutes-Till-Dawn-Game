@@ -31,6 +31,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.*;
+import view.util.CustomCursor;
+
 import javax.swing.plaf.PanelUI;
 import java.util.ArrayList;
 import java.util.List;
@@ -314,6 +316,7 @@ public class GameScreen {
         gamePane.getChildren().add(levell);
 
         scene = new Scene(gamePane, WIDTH, HEIGHT);
+        CustomCursor.setGameCursor(scene);
 
         gamePane.setOnKeyPressed(event -> {
             System.out.println("KEY PRESSED IN GAMEPANE: " + event.getCode());

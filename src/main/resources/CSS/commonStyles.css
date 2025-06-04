@@ -89,3 +89,35 @@ TextField , PasswordField {
     -fx-font-size: 14px;
     -fx-text-fill: #333;
 }
+
+@font-face {
+    src: url('/fonts/MyFont.ttf');
+    font-family: 'GameFont';
+}
+
+.username-label {
+    -fx-font-family: "GameFont";
+    -fx-font-size: 12px;
+    -fx-text-fill: black;
+}
+
+.score-label {
+    -fx-font-family: "GameFont";
+    -fx-font-size: 11px;
+    -fx-text-fill: black;
+}
+
+.mainMenuButtons .button {
+    -fx-font-family: "GameFont";
+    -fx-font-size: 10px;
+    -fx-text-fill: black;
+    -fx-background-color: transparent;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px 20px;
+}
+
+.mainMenuButtons .button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}

@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import view.Paths;
 import javafx.scene.input.MouseEvent;
+import view.util.CustomCursor;
 
 //import java.awt.event.MouseEvent;
 import java.net.URL;
@@ -37,6 +38,7 @@ public class findPassword extends Application {
                     Paths.BLACK_WHITE_STYLE_FILE_PATH.getPath()).toExternalForm());
         }
         Scene findPassScene = new Scene(borderPane);
+        CustomCursor.setGameCursor(findPassScene);
         stage.setScene(findPassScene);
         stage.show();
     }

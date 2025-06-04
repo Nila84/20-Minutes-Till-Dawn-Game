@@ -214,26 +214,28 @@ public class GameViewController {
 
     public static void changeToNextMusic() {
 //        mediaPlayer.setMute(GameMenu.isMute);
-        currentSongIndex = (currentSongIndex + 1) % musicFileNames.size();
+        currentSongIndex++;
+        changeMusic((currentSongIndex % 3) +  1);
 
-        String filePath = Paths.MUSICS_PATH.getPath() + musicFileNames.get(currentSongIndex);
-        File file = new File(filePath);
-        if (!file.exists()) {
-            System.out.println("Music file not found: " + filePath);
-            return;
-        }
-
-        Media media = new Media(file.toURI().toString());
-        MediaPlayer newPlayer = new MediaPlayer(media);
-        if (mediaPlayer != null) {
-            newPlayer.setMute(mediaPlayer.isMute());
-            newPlayer.setVolume(mediaPlayer.getVolume());
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
-        }
-
-        mediaPlayer = newPlayer;
-        mediaPlayer.play();
+//        String filePath = Paths.MUSICS_PATH.getPath() + musicFileNames.get(currentSongIndex);
+//        File file = new File(filePath);
+//        if (!file.exists()) {
+//            System.out.println("Music file not found: " + filePath);
+//            return;
+//        }
+//
+//        Media media = new Media(file.toURI().toString());
+//        MediaPlayer newPlayer = new MediaPlayer(media);
+//        if (mediaPlayer != null) {
+//            mediaPlayer.setMute(GameMenu.isMute);
+//            newPlayer.setMute(mediaPlayer.isMute());
+//            newPlayer.setVolume(mediaPlayer.getVolume());
+//            mediaPlayer.stop();
+//            mediaPlayer.dispose();
+//        }
+//
+//        mediaPlayer = newPlayer;
+//        mediaPlayer.play();
     }
 
 
@@ -295,7 +297,6 @@ public class GameViewController {
         Button resume = new Button("▶️ Resume");
         Button restart = new Button("🔄 Restart");
         Button saveGame = new Button("💾 Save Game");
-        Button helpKeys = new Button("❓ Help (Keys)");
         Button changeMusic = new Button("🎵 Change Music");
         Button changeTheme = new Button("🎨 Change Theme");
         Button cheatCodes = new Button("💻 Cheat Codes");
@@ -303,7 +304,7 @@ public class GameViewController {
         Button quitGame = new Button("❌ Quit Game");
 
         pauseRoot.getChildren().addAll
-                (resume, restart, saveGame, helpKeys, changeMusic, changeTheme, cheatCodes,abilities, quitGame);
+                (resume, restart, saveGame, changeMusic, changeTheme, cheatCodes,abilities, quitGame);
 
         Stage popupStage = new Stage(StageStyle.TRANSPARENT);
         popupStage.initOwner(LoginMenu.stageOfProgram);
@@ -327,10 +328,6 @@ public class GameViewController {
 
         quitGame.setOnAction(e -> {
             showGameOverScreen(popupStage);
-        });
-
-        helpKeys.setOnAction(e -> {
-            helpKeyEvents();
         });
 
         changeMusic.setOnAction(e -> {
@@ -621,30 +618,6 @@ public class GameViewController {
             }
         });
     }
-    //TODO : change it
-    public static void helpKeyEvents(){
-        VBox pauseRoot2 = new VBox(5);
-        pauseRoot2.getChildren().add(new Label("Paused"));
-        pauseRoot2.setStyle("-fx-background-color: rgba(255, 255, 255, 0.8);");
-        pauseRoot2.setAlignment(Pos.CENTER);
-        pauseRoot2.setPadding(new Insets(20));
-        pauseRoot2.getChildren().add(new Label("Shoot : Space\nIce mode: " +
-                "Tab\nMove Right(Phase 4): " +
-                "Right arrow\nMove Left(Phase 4): Left arrow"));
-        Button okButton = new Button("OK");
-        pauseRoot2.getChildren().add(okButton);
-        Stage popupStage2 = new Stage(StageStyle.TRANSPARENT);
-        popupStage2.initOwner(LoginMenu.stageOfProgram);
-        popupStage2.initModality(Modality.APPLICATION_MODAL);
-        popupStage2.setScene(new Scene(pauseRoot2, Color.TRANSPARENT));
-        popupStage2.show();
-        okButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                popupStage2.hide();
-            }
-        });
-    }
 
     public static void setHandleForChangeMusicButtons(Button button , int numberOfSong) {
         button.setOnAction(e -> {
@@ -661,6 +634,21 @@ public class GameViewController {
             }
             songPlayer = mediaPlayer;
         });
+    }
+
+    public static void changeMusic(int numberOfSong) {
+        Media song = new Media(new File(Paths.MUSICS_PATH.getPath() + numberOfSong + ".mp3")
+                .toURI().toString());
+        songPlayer.stop();
+        MediaPlayer mediaPlayer = new MediaPlayer(song);
+        mediaPlayer.setAutoPlay(true);
+        mediaPlayer.setCycleCount(-1);
+        if (GameMenu.isMute)
+            mediaPlayer.setMute(true);
+        else if (!isPlay) {
+            mediaPlayer.pause();
+        }
+        songPlayer = mediaPlayer;
     }
 
     public static void restartEvent(Stage popupStage) throws Exception {
