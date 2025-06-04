@@ -23,7 +23,7 @@ public class App {
     public static void setCurrentUser(User currentUser) {
         App.currentUser = currentUser;
     }
-    public static void run() {
+    public static void run(){
         DBController.loadCurrentUser();
         DBController.loadUsers();
         if (App.getCurrentUser() != null)

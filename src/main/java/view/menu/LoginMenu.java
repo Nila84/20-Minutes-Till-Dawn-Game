@@ -5,8 +5,6 @@ import controller.GameController;
 import controller.GameViewController;
 import controller.UserController;
 import javafx.application.Application;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,7 +18,6 @@ import view.Paths;
 import view.enums.LoginMenuText;
 import view.util.CustomCursor;
 
-import java.net.URL;
 
 public class LoginMenu extends Application {
     public static Stage stageOfProgram;
