@@ -10,7 +10,7 @@ public enum PreGameMenuText {
 
     // Weapon names
     REVOLVER_EN("Revolver"), REVOLVER_FR("Revolver"),
-    SHOTGUN_EN("Shotgun"), SHOTGUN_FR("Fusil à pompe"),
+    SHOTGUN_EN("Shotgun"), SHOTGUN_FR("Shotgun"),
     SMG_DUAL_EN("SMGs Dual"), SMG_DUAL_FR("SMGs Double"),
 
     // Time label

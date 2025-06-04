@@ -31,7 +31,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.*;
+import view.enums.GameScreenText;
 import view.util.CustomCursor;
+import view.enums.GameScreenText;
 
 import javax.swing.plaf.PanelUI;
 import java.util.ArrayList;
@@ -802,7 +804,6 @@ public class GameScreen {
         }
     }
 
-
     public void updateGameTime() {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         long remainingTime = gameDuration - elapsedTime;
@@ -810,18 +811,40 @@ public class GameScreen {
         if (remainingTime <= 0) {
             remainingTime = 0;
             gameTimer.stop();
-            System.out.println("You Won :)");
+            System.out.println(getText(GameScreenText.WIN_EN));
             App.getCurrentUser().setWon(1);
             winScreen();
         }
 
         String formattedTime = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60);
-        timeText.setText("Time: " + formattedTime);
-        hpText.setText("HP: " + hero.getHp());
-        kills.setText("Kills: " + App.getCurrentUser().killNumber);
-        weaponNum.setText("Weapons: " + weapon.getCurrentAmmo());
-        abilityType.setText("Ability: " + ability.getName());
-        levell.setText("Level: " + App.getCurrentUser().level);
+        timeText.setText(getText(GameScreenText.TIME_EN) + formattedTime);
+        hpText.setText(getText(GameScreenText.HP_EN) + hero.getHp());
+        kills.setText(getText(GameScreenText.KILLS_EN) + App.getCurrentUser().killNumber);
+        weaponNum.setText(getText(GameScreenText.WEAPONS_EN) + weapon.getCurrentAmmo());
+        abilityType.setText(getText(GameScreenText.ABILITY_EN) + getAbilityName(ability.getName()));
+        levell.setText(getText(GameScreenText.LEVEL_EN) + App.getCurrentUser().level);
+    }
+
+    private String getText(GameScreenText textType) {
+        return GameScreenText.getText(textType, GameController.language);
+    }
+
+    private String getAbilityName(String abilityName) {
+        boolean isEnglish = GameController.language;
+        switch(abilityName) {
+            case "VITALITY":
+                return GameScreenText.getText(GameScreenText.VITALITY_EN, isEnglish);
+            case "DAMAGER":
+                return GameScreenText.getText(GameScreenText.DAMAGER_EN, isEnglish);
+            case "PROCREASE":
+                return GameScreenText.getText(GameScreenText.PROCREASE_EN, isEnglish);
+            case "AMOCREASE":
+                return GameScreenText.getText(GameScreenText.AMOCREASE_EN, isEnglish);
+            case "SPEEDY":
+                return GameScreenText.getText(GameScreenText.SPEEDY_EN, isEnglish);
+            default:
+                return abilityName;
+        }
     }
 
     public static void updateMonsters() {
