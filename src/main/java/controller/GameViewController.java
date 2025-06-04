@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -62,13 +63,27 @@ public class GameViewController {
         keyBindings.put("SHOOT", KeyCode.SPACE);
     }
 
-    private static Hero hero = App.getCurrentUser().getSelectedHero();
+//    private static Hero hero = App.getCurrentUser().getSelectedHero();
 
-    private static void enableInfiniteAmmo(int seconds) {
-        System.out.println("Infinite ammo enabled for " + seconds + " seconds");
-        //TODO
+    public static void killAllMonsters() {
+        List<Monster> monsters = GameScreen.getMonsters();
+        List<Monster> monstersToRemove = new ArrayList<>(monsters);
+
+        for (Monster monster : monstersToRemove) {
+            GameScreen.createSmokeEffect(monster.getX(), monster.getY());
+
+            ExperienceOrb orb = new ExperienceOrb(monster.getX(), monster.getY());
+            GameScreen.getInstance().getExperienceOrbs().add(orb);
+            GameScreen.gamePane.getChildren().add(orb.getShape());
+
+            GameScreen.gamePane.getChildren().remove(monster.getShape());
+            monsters.remove(monster);
+
+            App.getCurrentUser().killNumber++;
+        }
+
+        System.out.println("All monsters killed!");
     }
-
     public static KeyCode getKeyBinding(String action) {
         return keyBindings.getOrDefault(action, null);
     }
@@ -82,76 +97,129 @@ public class GameViewController {
 //        final boolean[] downPressed = {false};
 //        final boolean[] leftPressed = {false};
 //        final boolean[] rightPressed = {false};
+//        final boolean[] isMoving = {false};
 //
 //        scene.setOnKeyPressed(event -> {
 //            KeyCode keyCode = event.getCode();
+//            boolean wasMoving = isMoving[0];
 //
 //            if (keyCode == getKeyBinding("UP")) upPressed[0] = true;
 //            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = true;
 //            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = true;
 //            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = true;
 //
+//            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
+//
+//            if (isMoving[0] && !wasMoving) {
+//                GameScreen.getInstance().startPulseAnimation();
+//            }
+//
 //            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
 //        });
 //
 //        scene.setOnKeyReleased(event -> {
 //            KeyCode keyCode = event.getCode();
+//            boolean wasMoving = isMoving[0];
 //
 //            if (keyCode == getKeyBinding("UP")) upPressed[0] = false;
 //            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = false;
 //            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = false;
 //            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = false;
 //
+//            isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
+//
+//            if (!isMoving[0] && wasMoving) {
+//                GameScreen.getInstance().stopPulseAnimation();
+//            }
+//
 //            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
 //        });
 //    }
 
     public static void setupMovementControls(Scene scene, Circle player, double speed) {
+        final boolean[] isMoving = {false};
         final boolean[] upPressed = {false};
         final boolean[] downPressed = {false};
         final boolean[] leftPressed = {false};
         final boolean[] rightPressed = {false};
-        final boolean[] isMoving = {false};
-
         scene.setOnKeyPressed(event -> {
             KeyCode keyCode = event.getCode();
             boolean wasMoving = isMoving[0];
 
-            if (keyCode == getKeyBinding("UP")) upPressed[0] = true;
-            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = true;
-            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = true;
-            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = true;
-
+            if (keyCode == getKeyBinding("UP")) {
+                upPressed[0] = true;
+                moveWorld(0, speed);
+            } else if (keyCode == getKeyBinding("DOWN")) {
+                downPressed[0] = true;
+                moveWorld(0, -speed);
+            } else if (keyCode == getKeyBinding("LEFT")) {
+                leftPressed[0] = true;
+                moveWorld(speed, 0);
+            } else if (keyCode == getKeyBinding("RIGHT")) {
+                rightPressed[0] = true;
+                moveWorld(-speed, 0);
+            }
             isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
-
-            // شروع انیمیشن هنگام شروع حرکت
             if (isMoving[0] && !wasMoving) {
                 GameScreen.getInstance().startPulseAnimation();
             }
-
-            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
         });
-
         scene.setOnKeyReleased(event -> {
             KeyCode keyCode = event.getCode();
             boolean wasMoving = isMoving[0];
 
-            if (keyCode == getKeyBinding("UP")) upPressed[0] = false;
-            else if (keyCode == getKeyBinding("DOWN")) downPressed[0] = false;
-            else if (keyCode == getKeyBinding("LEFT")) leftPressed[0] = false;
-            else if (keyCode == getKeyBinding("RIGHT")) rightPressed[0] = false;
-
+            if (keyCode == getKeyBinding("UP")) {
+                upPressed[0] = false;
+                moveWorld(0, speed);
+            } else if (keyCode == getKeyBinding("DOWN")) {
+                downPressed[0] = false;
+                moveWorld(0, -speed);
+            } else if (keyCode == getKeyBinding("LEFT")) {
+                leftPressed[0] = false;
+                moveWorld(speed, 0);
+            } else if (keyCode == getKeyBinding("RIGHT")) {
+                rightPressed[0] = false;
+                moveWorld(-speed, 0);
+            }
             isMoving[0] = upPressed[0] || downPressed[0] || leftPressed[0] || rightPressed[0];
-
-            // توقف انیمیشن هنگام توقف حرکت
             if (!isMoving[0] && wasMoving) {
                 GameScreen.getInstance().stopPulseAnimation();
             }
-
-            updatePlayerPosition(player, speed, upPressed[0], downPressed[0], leftPressed[0], rightPressed[0]);
         });
     }
 
+    private static void moveWorld(double dx, double dy) {
+        GameScreen.cameraOffsetX += dx;
+        GameScreen.cameraOffsetY += dy;
+
+        for (Node node : GameScreen.worldPane.getChildren()) {
+            if (node != GameScreen.getPlayer()) {
+                node.setTranslateX(node.getTranslateX() + dx);
+                node.setTranslateY(node.getTranslateY() + dy);
+            }
+        }
+
+        for (Monster monster : GameScreen.getMonsters()) {
+            monster.setX(monster.getX() + dx);
+            monster.setY(monster.getY() + dy);
+        }
+
+        for (Obstacle obstacle : GameScreen.obstacles) {
+            obstacle.setX(obstacle.getX() + dx);
+            obstacle.setY(obstacle.getY() + dy);
+        }
+
+//        if (GameScreen.barrierActive) {
+//            GameScreen.barrier.setX(-GameScreen.barrier.getX() - dx);
+//            GameScreen.barrier.setY(-GameScreen.barrier.getY() - dy);
+//        }
+        GameScreen.updateBarrierPosition(GameScreen.cameraOffsetX, GameScreen.cameraOffsetY);
+
+        for (Bullet bullet : GameScreen.bullets) {
+//            bullet.setX(bullet.getX() + dx);
+//            bullet.setY(bullet.getY() + dy);
+        }
+    }
     public static Monster createMonsterFromType(String type, double x, double y) {
         switch (type) {
             case "EyebatMonster":
@@ -552,8 +620,8 @@ public class GameViewController {
             System.out.println("15 Elder enemies added!");
         });
 
-        HBox cheat5 = createCheatBox("Infinite Ammo", "Unlimited ammo for 60 seconds", "F5", () -> {
-            enableInfiniteAmmo(60);
+        HBox cheat5 = createCheatBox("Kill Monsters", "Kill all Monsters", "F5", () -> {
+            killAllMonsters();
             System.out.println("Infinite ammo enabled for 60 seconds");
         });
 

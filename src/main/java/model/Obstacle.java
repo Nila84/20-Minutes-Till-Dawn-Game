@@ -30,6 +30,14 @@ public class Obstacle {
         return shape.getCenterY();
     }
 
+    public void setX(double x) {
+        shape.setCenterX(x);
+    }
+
+    public void setY(double y) {
+        shape.setCenterY(y);
+    }
+
     public double getRadius() {
         return shape.getRadius();
     }

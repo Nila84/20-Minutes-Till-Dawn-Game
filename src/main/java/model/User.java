@@ -3,6 +3,7 @@ package model;
 import controller.App;
 import controller.DBController;
 import controller.GameController;
+import controller.UserController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +25,7 @@ public class User implements Comparable<User>{
     public int killNum;
     public int killNumber;
     private List<Ability> acquiredAbilities = new ArrayList<>();
-    private long longestSurvivalTime;
+    public long longestSurvivalTime;
     public int score;
     public int scores;
 

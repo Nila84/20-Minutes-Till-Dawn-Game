@@ -4,6 +4,7 @@ import javafx.animation.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import view.menu.GameScreen;
 
 public abstract class Monster {
     protected int hp;
@@ -72,9 +73,20 @@ public abstract class Monster {
     public void moveTowards(Circle player) {
         double playerX = player.getCenterX();
         double playerY = player.getCenterY();
-
-        double dx = playerX - x;
-        double dy = playerY - y;
+//
+//        double dx = playerX - x;
+//        double dy = playerY - y;
+//        double distance = Math.sqrt(dx * dx + dy * dy);
+//
+//        if (distance > 0) {
+//            x += (dx / distance) * speed;
+//            y += (dy / distance) * speed;
+//        }
+//
+//        shape.setCenterX(x);
+//        shape.setCenterY(y);
+        double dx = playerX - getX();
+        double dy = playerY - getY();
         double distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > 0) {
@@ -82,8 +94,11 @@ public abstract class Monster {
             y += (dy / distance) * speed;
         }
 
+//        move(dx, dy);
         shape.setCenterX(x);
         shape.setCenterY(y);
+//        getShape().setTranslateX(getX() -playerX- GameScreen.cameraOffsetX);
+//        getShape().setTranslateY(getY() -playerX- GameScreen.cameraOffsetY);
     }
 
     public void takeDamage(int amount) {

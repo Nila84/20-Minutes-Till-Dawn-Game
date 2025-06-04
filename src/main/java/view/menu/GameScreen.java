@@ -41,11 +41,11 @@ public class GameScreen {
     private long lastTentacleSpawnTime = 0;
     private long lastEyebatSpawnTime = 0;
     private int eyebatSpawnCount = 0;
-    private static List<Bullet> bullets = new ArrayList<>();
+    public static List<Bullet> bullets = new ArrayList<>();
     private List<BulletForMonster> activeBullets = new ArrayList<>();
     private List<ExperienceOrb> experienceOrbs = new ArrayList<>();
     private List<Particle> particles = new ArrayList<>();
-    private List<Obstacle> obstacles = new ArrayList<>();
+    public static List<Obstacle> obstacles = new ArrayList<>();
     private static GameScreen instance;
     private static final int PLAYER_RADIUS = 15;
     private static final double MOVEMENT_SPEED = 5.0;
@@ -84,8 +84,8 @@ public class GameScreen {
     public AnimationTimer gameLoop;
     private static boolean busFight = false;
     private static boolean canBussFight = true;
-    private static Rectangle barrier;
-    private static boolean barrierActive = false;
+    public static Rectangle barrier;
+    public static boolean barrierActive = false;
     private static Timeline barrierTimeline;
     private static final double INITIAL_BARRIER_SIZE = 100;
     private static final double BARRIER_SHRINK_DURATION = 30;
@@ -93,6 +93,9 @@ public class GameScreen {
     private static final int BARRIER_DAMAGE = 2;
     private static long lastBarrierDamageTime = 0;
     private static final long BARRIER_DAMAGE_COOLDOWN = 1000;
+    public static double cameraOffsetX = 0;
+    public static double cameraOffsetY = 0;
+    public static Pane worldPane = new Pane();
 
 
     public GameScreen() {
@@ -121,6 +124,10 @@ public class GameScreen {
 
     public static void setGameDuration(int gameDurationn) {
         gameDuration += gameDurationn;
+    }
+
+    public List<ExperienceOrb> getExperienceOrbs() {
+        return experienceOrbs;
     }
 
     public static void setMonsters(List<Monster> monstersList) {
@@ -232,6 +239,7 @@ public class GameScreen {
     }
 
     public void start(Stage stage, int minutes, Hero selectedHero , Weapon weapon, Ability ability,int level) {
+        worldPane.setPrefSize(WIDTH , HEIGHT);
         App.getCurrentUser().killNumber = 0;
         App.getCurrentUser().score = 0;
         this.hero = selectedHero;
@@ -254,12 +262,22 @@ public class GameScreen {
         }
         gamePane.getChildren().add(GameViewController.createMuteUnmuteIcon());
         gamePane.getChildren().add(GameViewController.createMenuIcon(gamePane));
+        gamePane.getChildren().add(worldPane);
+
 
         if (hero.getName().equals("SHANA")) player = new Circle(PLAYER_RADIUS, Color.PURPLE);
         else if (hero.getName().equals("DIAMOND")) player = new Circle(PLAYER_RADIUS, Color.PINK);
         else if (hero.getName().equals("LILITH")) player = new Circle(PLAYER_RADIUS, Color.GREEN);
         else if (hero.getName().equals("SCARLET")) player = new Circle(PLAYER_RADIUS, Color.GRAY);
         else if (hero.getName().equals("DASHER")) player = new Circle(PLAYER_RADIUS, Color.BLUE);
+        Pane viewportPane = new Pane(); // پنی که فقط بخش قابل مشاهده را نشان می‌دهد
+        viewportPane.setPrefSize(WIDTH, HEIGHT);
+        viewportPane.setClip(new Rectangle(WIDTH, HEIGHT));
+
+        worldPane.getChildren().addAll(/* تمام المان‌های بازی */);
+        viewportPane.getChildren().add(worldPane);
+
+        Scene scene = new Scene(viewportPane, WIDTH, HEIGHT);
         player.setCenterX(WIDTH / 2.0);
         player.setCenterY(HEIGHT / 2.0);
         setupPulseAnimation();
@@ -320,7 +338,7 @@ public class GameScreen {
         gamePane.getChildren().add(abilityType);
         gamePane.getChildren().add(levell);
 
-        Scene scene = new Scene(gamePane, WIDTH, HEIGHT);
+        scene = new Scene(gamePane, WIDTH, HEIGHT);
 
         gamePane.setOnKeyPressed(event -> {
             System.out.println("KEY PRESSED IN GAMEPANE: " + event.getCode());
@@ -374,20 +392,12 @@ public class GameScreen {
 
         addGlowToPlayer();
         addObstacles();
-        initializeLevelProgressBar(gamePane); // یا هر Pane اصلی که داری
+        initializeLevelProgressBar(gamePane);
         GameViewController.setupMovementControls(scene, player,hero.getSpeed());
 
-//        spawnMonsters(5);
         if (monsters == null || monsters.isEmpty()) {
             spawnMonsters(5);
         }
-//        if (monsters != null) {
-//            for (Monster monster : monsters) {
-//                if (!gamePane.getChildren().contains(monster.getShape())) {
-//                    gamePane.getChildren().add(monster.getShape());
-//                }
-//            }
-//        }
         for (Monster monster : monsters) {
             if (!gamePane.getChildren().contains(monster.getShape())) {
                 gamePane.getChildren().add(monster.getShape());
@@ -520,16 +530,37 @@ public class GameScreen {
 
         if (nearest != null) {
             highlightTarget(nearest);
-            BulletForMonster bullet = new BulletForMonster(px, py, nearest.getX(), nearest.getY());
-            bullet.getShape().setFill(Color.RED);
-            bullet.setTarget(nearest);
-            bullet.setDamage(weapon.getTotalDamage());
+            int projectileCount = App.getCurrentUser().getSelectedWeapon().getProjectileCount();
 
-            activeBullets.add(bullet);
-            gamePane.getChildren().add(bullet.getShape());
-            GameMenu.playSFX();
+            Timeline timeline = new Timeline();
+            for (int i = 0; i < projectileCount; i++) {
+                int index = i;
+                Monster finalNearest = nearest;
+                timeline.getKeyFrames().add(new KeyFrame(Duration.millis(index * 50), event -> {
+                    BulletForMonster bullet = new BulletForMonster(px, py, finalNearest.getX(), finalNearest.getY());
+                    bullet.getShape().setFill(Color.RED);
+                    bullet.setTarget(finalNearest);
+                    bullet.setDamage(weapon.getTotalDamage());
+
+                    activeBullets.add(bullet);
+                    gamePane.getChildren().add(bullet.getShape());
+
+                    animateBullet(bullet);
+                    GameMenu.playSFX();
+                }));
+            }
+            timeline.play();
         }
     }
+
+    private void animateBullet(BulletForMonster bullet) {
+        Timeline animation = new Timeline(new KeyFrame(Duration.millis(10), event -> {
+            bullet.update(); // متد `update` برای حرکت طبیعی تیر
+        }));
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.play();
+    }
+
 
 
     private void spawnMonsters(int count) {
@@ -593,13 +624,6 @@ public class GameScreen {
         gameTimer.start();
     }
 
-//    public void checkBussFight() {
-//        long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
-//        if (elapsedTime >= gameDuration / 2 && canBussFight) {
-//            spawnElderMonster();
-//            canBussFight = false;
-//        }
-//    }
     public void checkBussFight() {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         if (elapsedTime >= gameDuration / 2 && canBussFight) {
@@ -1132,32 +1156,90 @@ public class GameScreen {
             System.out.println("No ammo!");
             return;
         }
+        int projectileCount = weapon.getProjectileCount();
+        double spreadAngle = 15.0;
 
         double px = player.getCenterX();
         double py = player.getCenterY();
         double targetX = px + (dirX * 1000);
         double targetY = py + (dirY * 1000);
+        for (int i = 0; i < projectileCount; i++) {
+            // محاسبه زاویه برای تیرهای چندگانه
+            double angleOffset = (i - (projectileCount - 1) / 2.0) * spreadAngle;
+            double radianOffset = Math.toRadians(angleOffset);
 
-        BulletForMonster bullet = new BulletForMonster(px, py, targetX, targetY);
-        bullet.setDamage(weapon.getTotalDamage());
+            // محاسبه جهت جدید با در نظر گرفتن انحراف
+            double newDirX = dirX * Math.cos(radianOffset) - dirY * Math.sin(radianOffset);
+            double newDirY = dirX * Math.sin(radianOffset) + dirY * Math.cos(radianOffset);
 
-        switch(weapon.getName()) {
-            case "Revolver":
-                bullet.getShape().setFill(Color.CYAN);
-                break;
-            case "Shotgun":
-                bullet.getShape().setFill(Color.RED);
-                break;
-            case "SMGs Dual":
-                bullet.getShape().setFill(Color.PURPLE);
-                break;
+            // نرمالایز کردن جهت
+            double length = Math.sqrt(newDirX * newDirX + newDirY * newDirY);
+            if (length > 0) {
+                newDirX /= length;
+                newDirY /= length;
+            }
+            BulletForMonster bullet = new BulletForMonster(px, py, targetX, targetY);
+            bullet.setDamage(weapon.getTotalDamage());
+
+            switch(weapon.getName()) {
+                case "Revolver":
+                    bullet.getShape().setFill(Color.CYAN);
+                    break;
+                case "Shotgun":
+                    bullet.getShape().setFill(Color.RED);
+                    break;
+                case "SMGs Dual":
+                    bullet.getShape().setFill(Color.PURPLE);
+                    break;
+            }
+
+            activeBullets.add(bullet);
+            gamePane.getChildren().add(bullet.getShape());
         }
 
-        activeBullets.add(bullet);
-        gamePane.getChildren().add(bullet.getShape());
+//        BulletForMonster bullet = new BulletForMonster(px, py, targetX, targetY);
+//        bullet.setDamage(weapon.getTotalDamage());
+//
+//        switch(weapon.getName()) {
+//            case "Revolver":
+//                bullet.getShape().setFill(Color.CYAN);
+//                break;
+//            case "Shotgun":
+//                bullet.getShape().setFill(Color.RED);
+//                break;
+//            case "SMGs Dual":
+//                bullet.getShape().setFill(Color.PURPLE);
+//                break;
+//        }
+//
+//        activeBullets.add(bullet);
+//        gamePane.getChildren().add(bullet.getShape());
 
         System.out.println("Bullet added successfully. Total bullets: " + activeBullets.size());
     }
+//    private void shootInDirection(double dirX, double dirY) {
+//        GameMenu.playSFX();
+//        // موقعیت گلوله نسبت به دوربین
+//        double bulletX = player.getCenterX() - cameraOffsetX;
+//        double bulletY = player.getCenterY() - cameraOffsetY;
+//
+//        BulletForMonster bullet = new BulletForMonster(bulletX, bulletY, dirX, dirY);
+//        bullet.setDamage(weapon.getTotalDamage());
+//
+//        switch(weapon.getName()) {
+//            case "Revolver":
+//                bullet.getShape().setFill(Color.CYAN);
+//                break;
+//            case "Shotgun":
+//                bullet.getShape().setFill(Color.RED);
+//                break;
+//            case "SMGs Dual":
+//                bullet.getShape().setFill(Color.PURPLE);
+//                break;
+//        }
+//        activeBullets.add(bullet);
+//        worldPane.getChildren().add(bullet.getShape());
+//    }
     public void updateBulletsForMonster() {
         System.out.println("Updating bullets. Count: " + activeBullets.size());
 
@@ -1176,7 +1258,7 @@ public class GameScreen {
         System.out.println("Bullets after update: " + activeBullets.size());
     }
 
-    private void createSmokeEffect(double x, double y) {
+    public static void createSmokeEffect(double x, double y) {
         Circle smoke = new Circle(15);
         smoke.setCenterX(x);
         smoke.setCenterY(y);
@@ -1437,6 +1519,15 @@ public class GameScreen {
         barrierTimeline.setCycleCount(1);
         barrierTimeline.play();
     }
+
+    public static void updateBarrierPosition(double cameraOffsetX, double cameraOffsetY) {
+        if (!barrierActive) return;
+
+        // تنظیم موقعیت معکوس دیواره
+        barrier.setX(WIDTH / 2 - barrier.getWidth() / 2 - cameraOffsetX);
+        barrier.setY(HEIGHT / 2 - barrier.getHeight() / 2 - cameraOffsetY); // حرکت معکوس در محور Y
+    }
+
 
     private void restrictPlayerMovement() {
         if (!barrierActive) return;
