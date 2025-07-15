@@ -31,5 +31,6 @@ You control a hero who must survive relentless enemy waves for 20 minutes. Level
    git clone https://github.com/Nila84/20-Minutes-Till-Dawn-Game.git
 2.**Make sure Java and JavaFX are properly set up**
 You can use an IDE like IntelliJ IDEA or VS Code with JavaFX support.
+
 3.**Run the LoginMenu.java file**
 This is the main entry point of the game.
