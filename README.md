@@ -28,4 +28,4 @@ You control a hero who must survive relentless enemy waves for 20 minutes. Level
 
 1. **Clone the repository**
    ```bash
-   git clone 
+   git clone https://github.com/Nila84/20-Minutes-Till-Dawn-Game.git
