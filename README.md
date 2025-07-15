@@ -20,7 +20,7 @@ You control a hero who must survive relentless enemy waves for 20 minutes. Level
 
 - Java 17+  
 - JavaFX   
-- MVC Architectur
+- MVC Architecture
 
 ---
 
